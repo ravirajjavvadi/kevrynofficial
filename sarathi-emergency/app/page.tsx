@@ -12,8 +12,10 @@ import {
   Activity,
   Truck,
   Building2,
+  Github,
 } from 'lucide-react';
 import { useI18n } from '@/components/shared/LanguageProvider';
+import { StatCard } from '@/components/shared/StatCard';
 
 export default function Home() {
   const { t } = useI18n();
@@ -212,6 +214,22 @@ export default function Home() {
           </div>
         </motion.div>
 
+        {/* Stats Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="px-6 md:px-12 py-12 max-w-7xl mx-auto"
+        >
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <StatCard value="1,200+" label="Emergency Calls Handled" icon="🚑" color="red" />
+            <StatCard value="98%" label="ETA Accuracy" icon="🎯" color="blue" />
+            <StatCard value="4 min" label="Avg Response Time" icon="⚡" color="orange" />
+            <StatCard value="50+" label="Hospitals Connected" icon="🏥" color="green" />
+          </div>
+        </motion.div>
+
         {/* Features Grid */}
         <motion.div
           variants={containerVariants}
@@ -380,20 +398,36 @@ export default function Home() {
         </motion.div>
 
         {/* Footer */}
-        <footer className="border-t border-slate-800/50 backdrop-blur-md mt-20 py-8 px-6 md:px-12">
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-2">
-              <Image src="/favicon.ico" alt="Sarathi logo" width={20} height={20} />
-              <span className="font-bold gradient-text">SARATHI Emergency</span>
+        <footer className="border-t border-slate-800/50 backdrop-blur-md mt-20 py-10 px-6 md:px-12">
+          <div className="max-w-7xl mx-auto space-y-6">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+              <div className="flex items-center gap-3">
+                <Image src="/favicon.ico" alt="Sarathi logo" width={24} height={24} />
+                <div>
+                  <span className="font-bold gradient-text text-lg">SARATHI Emergency</span>
+                  <p className="text-xs text-slate-500">AI-powered emergency navigation</p>
+                </div>
+              </div>
+              <div className="flex gap-6 text-sm text-slate-400">
+                <a href="#" className="hover:text-white transition">Privacy</a>
+                <a href="#" className="hover:text-white transition">Terms</a>
+                <a href="#" className="hover:text-white transition">Documentation</a>
+                <a href="#" className="hover:text-white transition">Support</a>
+              </div>
+              <a
+                href="https://github.com/rickeygona"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="rickeygona on GitHub"
+                className="flex items-center gap-2 text-slate-400 hover:text-white transition text-sm"
+              >
+                <Github size={18} />
+                <span>rickeygona</span>
+              </a>
             </div>
-            <div className="flex gap-6 text-sm text-slate-400">
-              <a href="#" className="hover:text-white transition">Privacy</a>
-              <a href="#" className="hover:text-white transition">Terms</a>
-              <a href="#" className="hover:text-white transition">Documentation</a>
-              <a href="#" className="hover:text-white transition">Support</a>
-            </div>
-            <div className="text-sm text-slate-500">
-              © 2026 SARATHI. All emergency cases prioritized.
+            <div className="border-t border-slate-800/50 pt-4 flex flex-col sm:flex-row justify-between items-center gap-2 text-sm text-slate-500">
+              <span>© 2026 SARATHI. All emergency cases prioritized.</span>
+              <span>Built with ❤️ for emergency responders</span>
             </div>
           </div>
         </footer>
