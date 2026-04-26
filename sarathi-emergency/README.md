@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚨 SARATHI — Emergency Navigation System
 
-## Getting Started
+AI-powered emergency response platform for ambulance, police, and fire services. Smart routing, hospital selection, and real-time coordination.
 
-First, run the development server:
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/)
+
+## ✨ Key Features
+
+- 🗺️ **AI-Powered Routing** — Smart route analysis with real-time traffic via Groq AI
+- 🏥 **Hospital Network** — Bed availability & specialty filtering
+- ⚡ **Green Corridor** — Automated traffic alert system for emergency corridors
+- 🎙️ **Voice Assistant** — Hands-free navigation for drivers
+- 📍 **Real-Time Tracking** — Live location updates & ETA calculations
+- 🔐 **Secure Auth** — OTP-based driver verification
+- 📱 **PWA Support** — Installable on mobile devices
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 14 (App Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS v4 |
+| Animation | Framer Motion |
+| State | Zustand |
+| Maps | Google Maps API |
+| AI | Groq API (Mixtral-8x7b) |
+| DB | MongoDB Atlas |
+
+## 🚀 Getting Started
 
 ```bash
+# Install dependencies
+npm install
+
+# Add environment variables
+cp .env.local.example .env.local
+# Fill in NEXT_PUBLIC_GOOGLE_MAPS_KEY, GROQ_API_KEY, MONGODB_URI
+
+# Run dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📁 Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+app/
+├── (auth)/          # Driver login & registration
+├── (dashboard)/     # Driver, hospital, police, public portals
+├── api/             # Groq AI, hospital, traffic API routes
+└── page.tsx         # Landing page
 
-## Learn More
+components/
+├── shared/          # Navbar, StatCard, VoiceAssistant, ...
+└── map/             # Google Maps integration
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 🌐 Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Deployed on **Vercel** — auto-deploys on push to `main`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+git push origin main
+```
 
-## Deploy on Vercel
+## 👥 Contributors
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Username | Contributions |
+|----------|--------------|
+| [@ravirajjavvadi](https://github.com/ravirajjavvadi) | Project founder & core development |
+| [@rickeygona](https://github.com/rickeygona) | CSS button utilities, StatCard component, stats banner, SEO metadata, footer improvements, README |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+> Built with ❤️ for emergency responders
