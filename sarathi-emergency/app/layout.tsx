@@ -18,9 +18,9 @@ const robotoMono = Roboto_Mono({
 
 export const metadata: Metadata = {
   title: "SARATHI - Emergency Navigation System",
-  description: "AI-powered emergency response platform for ambulance, police, and fire services",
+  description: "AI-powered emergency response platform for ambulance, police, and fire services. Smart routing, hospital selection, and real-time coordination.",
+  keywords: ["emergency navigation", "ambulance routing", "hospital finder", "AI emergency response", "green corridor", "sarathi"],
   manifest: "/manifest.webmanifest",
-  viewport: "width=device-width, initial-scale=1",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -31,7 +31,20 @@ export const metadata: Metadata = {
     shortcut: "/favicon.ico",
     apple: "/favicon.ico",
   },
+  openGraph: {
+    title: "SARATHI - Emergency Navigation System",
+    description: "AI-powered emergency response for ambulance, police & fire services. Save lives with smart routing & real-time hospital coordination.",
+    type: "website",
+    locale: "en_IN",
+    siteName: "SARATHI Emergency",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SARATHI - Emergency Navigation System",
+    description: "AI-powered emergency response platform. Smart routing, hospital finder & real-time coordination for first responders.",
+  },
 };
+
 
 export default function RootLayout({
   children,
