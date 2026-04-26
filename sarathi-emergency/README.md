@@ -71,6 +71,7 @@ git push origin main
 |----------|--------------|
 | [@ravirajjavvadi](https://github.com/ravirajjavvadi) | Project founder & core development |
 | [@rickeygona](https://github.com/rickeygona) | CSS button utilities, StatCard component, stats banner, SEO metadata, footer improvements, README |
+| [@saiakhil-tech](https://github.com/saiakhil-tech) | LoadingSpinner component, global Next.js loading state, custom 404 error page, and AlertBanner UI |
 
 ---
 
