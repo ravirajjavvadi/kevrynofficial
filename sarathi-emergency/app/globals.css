@@ -107,6 +107,55 @@ body {
   @apply bg-gradient-to-r from-red-500 via-orange-500 to-red-600 bg-clip-text text-transparent;
 }
 
+/* Button — Emergency (Red) */
+.btn-emergency {
+  @apply inline-flex items-center justify-center gap-2
+         px-6 py-3 rounded-xl font-bold text-white
+         bg-gradient-to-r from-red-600 to-red-700
+         hover:from-red-700 hover:to-red-800
+         shadow-lg shadow-red-600/30
+         hover:shadow-red-600/50
+         active:scale-95
+         transition-all duration-200
+         cursor-pointer border-0 outline-none;
+}
+
+/* Button — Primary (Blue/Indigo) */
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2
+         px-6 py-3 rounded-xl font-bold text-white
+         bg-gradient-to-r from-blue-600 to-indigo-700
+         hover:from-blue-700 hover:to-indigo-800
+         shadow-lg shadow-blue-600/30
+         hover:shadow-blue-600/50
+         active:scale-95
+         transition-all duration-200
+         cursor-pointer border-0 outline-none;
+}
+
+/* Button — Secondary (Outline / Ghost) */
+.btn-secondary {
+  @apply inline-flex items-center justify-center gap-2
+         px-6 py-3 rounded-xl font-bold text-white
+         bg-white/10 border border-white/20
+         hover:bg-white/20 hover:border-white/40
+         backdrop-blur-sm
+         active:scale-95
+         transition-all duration-200
+         cursor-pointer outline-none;
+}
+
+/* Button — Outline Danger */
+.btn-outline {
+  @apply inline-flex items-center justify-center gap-2
+         px-6 py-3 rounded-xl font-bold
+         text-red-400 border border-red-500/50
+         hover:bg-red-500/10 hover:border-red-500
+         active:scale-95
+         transition-all duration-200
+         cursor-pointer outline-none;
+}
+
 /* Card Glow Effect */
 .card-glow {
   @apply border border-white/10 rounded-xl bg-white/5 backdrop-blur-md;
