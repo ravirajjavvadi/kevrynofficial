@@ -27,7 +27,12 @@ export async function GET(
   } catch (err: any) {
     console.error("[INTERN FETCH ERROR]", err);
     return NextResponse.json(
-      { error: "INTERNAL_ERROR", message: err.message },
+      { 
+        error: "INTERNAL_ERROR", 
+        message: err.message, 
+        debug_env: process.env.DATABASE_URL ? "SET" : "MISSING",
+        stack: process.env.NODE_ENV === "development" ? err.stack : undefined
+      },
       { status: 500 }
     );
   }
