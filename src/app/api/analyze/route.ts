@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import Groq from "groq-sdk";
 
+export const maxDuration = 60; // Extend Vercel runtime to 60 seconds
+
+
 // Workaround for pdf-parse browser-API dependencies in Node environment
 if (typeof global.DOMMatrix === "undefined") {
   (global as any).DOMMatrix = class DOMMatrix {};
@@ -123,10 +126,10 @@ Evaluate and return the JSON.`;
     }
 
     return NextResponse.json(analysis);
-  } catch (err) {
+  } catch (err: any) {
     console.error("[ANALYZE ROUTE ERROR]", err);
     return NextResponse.json(
-      { error: "SERVER_ERROR", message: "An unexpected error occurred." },
+      { error: "SERVER_ERROR", message: err.message || "An unexpected error occurred in the Neural Engine." },
       { status: 500 }
     );
   }
