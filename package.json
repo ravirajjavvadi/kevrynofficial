@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "DATABASE_URL=postgresql://unused:unused@localhost:5432/unused next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate"
