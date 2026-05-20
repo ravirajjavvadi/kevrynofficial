@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Intern {
+  id              String      @id @default(cuid())
+  name            String
+  email           String      @unique
+  clerkId         String?     @unique
+  role            String
+  score           Int         @default(0)
+  domain          String
+  status          InternStatus @default(ACTIVE)
+  joinedAt        DateTime    @default(now())
+  submissions     Submission[]
+  totalPoints     Int         @default(0)
+  attendance      Int         @default(0)
+  
+  @@index([email])
+}
+
+model Task {
+  id              String      @id @default(cuid())
+  title           String
+  description     String
+  deadline        DateTime
+  priority        Priority    @default(MEDIUM)
+  status          TaskStatus  @default(IN_PROGRESS)
+  assignedTo      String?     // Can be a domain or null for global
+  createdAt       DateTime    @default(now())
+  submissions     Submission[]
+}
+
+model Submission {
+  id              String      @id @default(cuid())
+  taskId          String
+  internId        String
+  repoUrl         String
+  deployUrl       String?
+  submissionDate  DateTime    @default(now())
+  aiAuditScore    Int?
+  feedback        String?
+  
+  task            Task        @relation(fields: [taskId], references: [id])
+  intern          Intern      @relation(fields: [internId], references: [id])
+}
+
+model Announcement {
+  id              String      @id @default(cuid())
+  title           String
+  content         String
+  priority        Boolean     @default(false)
+  createdAt       DateTime    @default(now())
+}
+
+enum InternStatus {
+  ACTIVE
+  GRADUATED
+  SUSPENDED
+}
+
+enum TaskStatus {
+  IN_PROGRESS
+  UNDER_REVIEW
+  COMPLETED
+  FAILED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
