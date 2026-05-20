@@ -76,7 +76,7 @@ function OfferContent() {
                <Mail className="w-2.5 h-2.5" /> <span className="text-[8px] font-bold uppercase tracking-widest leading-none text-white/40">protocol@kevryn.ai</span>
             </div>
             <div className="mt-1 px-3 py-1 rounded-full bg-white/5 border border-white/10 no-print">
-               <span className="text-[8px] font-black tracking-widest uppercase opacity-40">ID: {data.id.slice(-8)}</span>
+               <span className="text-[8px] font-black tracking-widest uppercase opacity-40">ID: {data.id?.toString().slice(-8) || "UNKNOWN"}</span>
             </div>
          </div>
       </header>
@@ -180,7 +180,7 @@ function OfferContent() {
                      <img src={qrImage} alt="Verification QR" className="w-20 h-20" />
                   </div>
                   <div className="space-y-1">
-                     <p className="text-[6px] font-mono text-brand uppercase break-all leading-none">{data.id}</p>
+                     <p className="text-[6px] font-mono text-brand uppercase break-all leading-none">{data.id || "N/A"}</p>
                      <p className="text-[7px] font-bold text-muted-foreground uppercase tracking-widest leading-none">Scan to authenticate</p>
                   </div>
                </div>
