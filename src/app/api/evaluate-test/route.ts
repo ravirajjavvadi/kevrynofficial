@@ -111,7 +111,9 @@ Answers Map: ${JSON.stringify(answers)}`;
                       name: name,
                       email: email,
                       clerkId: clerkUserId,
-                      currentPhase: "ONBOARDING",
+                      role: role.replace('-', ' ').toUpperCase(),
+                      domain: role,
+                      score: result.score || 0,
                       totalPoints: 0
                    }
                 });
