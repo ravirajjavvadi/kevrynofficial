@@ -101,27 +101,31 @@ Answers Map: ${JSON.stringify(answers)}`;
           clerkUserId = clerkData.id;
           console.log("[AUTOMATION SUCCESS] Clerk Identity Generated:", clerkUserId);
           
-          // 2B. PRISMA SYNCHRONIZATION
+          // 2B. NATIVE MONGODB SYNCHRONIZATION
           try {
-             // Fallback for missing DB URL, will warn but not crash
-             if (process.env.DATABASE_URL) {
-                const { db } = await import("@/lib/db");
-                await db.intern.create({
-                   data: {
-                      id: internId!,
-                      name: name,
-                      email: email,
-                      clerkId: clerkUserId,
-                      role: role.replace('-', ' ').toUpperCase(),
-                      domain: role,
-                      score: result.score || 0,
-                      totalPoints: 0
-                   }
-                });
-                console.log("[AUTOMATION SUCCESS] Synchronized with PostgreSQL Prisma DB.");
-             }
+             const { getDb } = await import("@/lib/db");
+             const db = await getDb();
+             
+             await db.collection("interns").updateOne(
+                { _id: internId! as any },
+                {
+                  $set: {
+                    name,
+                    email,
+                    clerkId: clerkUserId,
+                    role: role.replace('-', ' ').toUpperCase(),
+                    domain: role,
+                    score: result.score || 0,
+                    totalPoints: 0,
+                    joinedAt: new Date(),
+                    status: "ACTIVE"
+                  }
+                },
+                { upsert: true }
+             );
+             console.log("[AUTOMATION SUCCESS] Synchronized with Native MongoDB.");
           } catch(dbErr) {
-             console.warn("[WARNING] Prisma Synchronization skipped or failed.", dbErr);
+             console.warn("[WARNING] MongoDB Synchronization failed.", dbErr);
           }
 
         } else {
