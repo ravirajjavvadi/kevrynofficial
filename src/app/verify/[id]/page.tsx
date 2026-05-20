@@ -94,21 +94,21 @@ export default function VerificationPage() {
             <CheckCircle className="w-5 h-5 text-brand" />
             <span className="text-[10px] font-black text-brand uppercase tracking-[0.4em]">Credential Authenticated</span>
           </motion.div>
-          <h1 className="text-5xl font-black tracking-tighter uppercase sm:text-7xl">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter uppercase">
             Sovereign <span className="text-brand">Intern.</span>
           </h1>
         </div>
 
         {/* Credential Card */}
-        <div className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[4rem] p-12 md:p-16 space-y-12 shadow-2xl relative overflow-hidden group hover:border-brand/30 transition-all duration-700">
-           <div className="flex justify-between items-start border-b border-white/5 pb-12">
-              <div className="space-y-2">
+        <div className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[2.5rem] sm:rounded-[4rem] p-6 sm:p-12 md:p-16 space-y-8 md:space-y-12 shadow-2xl relative overflow-hidden group hover:border-brand/30 transition-all duration-700">
+           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-white/5 pb-8 md:pb-12">
+              <div className="space-y-1 md:space-y-2">
                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">Appointed Architect</span>
-                 <h2 className="text-4xl font-black tracking-tighter uppercase">{data.name}</h2>
+                 <h2 className="text-3xl md:text-4xl font-black tracking-tighter uppercase whitespace-nowrap">{data.name}</h2>
               </div>
-              <div className="text-right">
+              <div className="text-left md:text-right w-full md:w-auto">
                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">ID Sequence</span>
-                 <p className="text-lg font-mono font-bold text-brand uppercase tracking-widest">{data.id}</p>
+                 <p className="text-sm sm:text-lg font-mono font-bold text-brand uppercase tracking-widest break-all">{data.id}</p>
               </div>
            </div>
 
@@ -145,11 +145,11 @@ export default function VerificationPage() {
         </div>
 
         {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-           <button className="px-10 py-5 rounded-2xl bg-white text-black font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all flex items-center justify-center gap-3">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4 md:pt-8">
+           <button className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white text-black font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all flex items-center justify-center gap-3">
               <Download className="w-4 h-4" /> Export Credential
            </button>
-           <button className="px-10 py-5 rounded-2xl bg-white/5 border border-white/10 text-foreground font-black uppercase tracking-widest text-[10px] hover:bg-white/10 transition-all flex items-center justify-center gap-3">
+           <button className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white/5 border border-white/10 text-foreground font-black uppercase tracking-widest text-[10px] hover:bg-white/10 transition-all flex items-center justify-center gap-3">
               <Share2 className="w-4 h-4" /> Signal Authenticity
            </button>
         </div>

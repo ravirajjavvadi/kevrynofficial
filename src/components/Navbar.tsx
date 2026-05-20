@@ -15,7 +15,7 @@ export function Navbar() {
         className="absolute top-0 left-0 w-1/3 h-[1px] bg-gradient-to-r from-transparent via-brand to-transparent"
       />
 
-      <div className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 h-20 md:h-24 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 group relative">
           <motion.div
             whileHover={{ rotate: 180, scale: 1.1 }}
