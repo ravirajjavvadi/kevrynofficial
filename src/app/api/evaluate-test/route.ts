@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { getSelectionEmail, getRejectionEmail } from "@/lib/email-templates";
 import { registerIntern, generateInternID } from "@/lib/registry";
 
@@ -8,7 +8,13 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 export async function POST(req: Request) {
   try {
@@ -53,8 +59,11 @@ Answers Map: ${JSON.stringify(answers)}`;
 
     const result = JSON.parse(chatCompletion.choices[0].message.content || "{}");
 
-    // 2. Sovereign Onboarding Sequence
+    // 2. Sovereign Onboarding Sequence & Identity Generation
     let internId = null;
+    let tempPwd = undefined;
+    let clerkUserId = null;
+
     if (result.verdict === "ADMITTED") {
       const newId = generateInternID(name, role);
       const registeredData = registerIntern({
@@ -66,6 +75,58 @@ Answers Map: ${JSON.stringify(answers)}`;
         domain: role
       });
       internId = registeredData.id;
+
+      // Generate a secure temporary password
+      tempPwd = "KR-" + Math.random().toString(36).substring(2, 10).toUpperCase() + "!";
+
+      // 2A. CLERK IDENTITY PROVISIONING
+      try {
+        const clerkRes = await fetch("https://api.clerk.com/v1/users", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${process.env.CLERK_SECRET_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            email_address: [email],
+            password: tempPwd,
+            first_name: name.split(' ')[0],
+            last_name: name.split(' ').slice(1).join(' '),
+            public_metadata: { clearance: 3, role: "intern", internId }
+          })
+        });
+
+        if (clerkRes.ok) {
+          const clerkData = await clerkRes.json();
+          clerkUserId = clerkData.id;
+          console.log("[AUTOMATION SUCCESS] Clerk Identity Generated:", clerkUserId);
+          
+          // 2B. PRISMA SYNCHRONIZATION
+          try {
+             // Fallback for missing DB URL, will warn but not crash
+             if (process.env.DATABASE_URL) {
+                const { db } = await import("@/lib/db");
+                await db.intern.create({
+                   data: {
+                      name: name,
+                      email: email,
+                      clerkId: clerkUserId,
+                      currentPhase: "ONBOARDING",
+                      totalPoints: 0
+                   }
+                });
+                console.log("[AUTOMATION SUCCESS] Synchronized with PostgreSQL Prisma DB.");
+             }
+          } catch(dbErr) {
+             console.warn("[WARNING] Prisma Synchronization skipped or failed.", dbErr);
+          }
+
+        } else {
+          console.error("[CLERK PROVISION ERROR]", await clerkRes.text());
+        }
+      } catch (authErr) {
+        console.error("[IDENTITY FAILURE] Could not reach Clerk API:", authErr);
+      }
     }
 
     // 3. Automated Onboarding Email (Resend)
@@ -74,11 +135,11 @@ Answers Map: ${JSON.stringify(answers)}`;
       const loginUrl = internId ? `${host}/offer?id=${internId}` : host;
 
       const emailHtml = (result.verdict === "ADMITTED" && internId)
-        ? getSelectionEmail(name, role, loginUrl, internId)
+        ? getSelectionEmail(name, role, loginUrl, internId, tempPwd)
         : getRejectionEmail(name, role);
 
-      await resend.emails.send({
-        from: 'KevRyn Protocol <onboarding@resend.dev>',
+      await transporter.sendMail({
+        from: `"KevRyn Protocol" <${process.env.EMAIL_USER}>`,
         to: email, 
         subject: result.verdict === "ADMITTED" 
           ? `[PROTOCOL] Selection Confirmation: ${role}` 
