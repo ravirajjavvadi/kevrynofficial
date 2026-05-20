@@ -44,3 +44,11 @@ export function getInternData(id: string): InternData | null {
   const registry: InternData[] = JSON.parse(localStorage.getItem(REGISTRY_KEY) || "[]");
   return registry.find(intern => intern.id === id) || null;
 }
+
+/** Fallback lookup by email – used when MongoDB record doesn't exist (legacy interns) */
+export function getInternDataByEmail(email: string): InternData | null {
+  if (typeof window === "undefined") return null;
+
+  const registry: InternData[] = JSON.parse(localStorage.getItem(REGISTRY_KEY) || "[]");
+  return registry.find(intern => intern.email?.toLowerCase() === email?.toLowerCase()) || null;
+}

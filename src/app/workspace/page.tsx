@@ -17,6 +17,9 @@ import {
   Loader2
 } from "lucide-react";
 
+import { useUser } from "@clerk/nextjs";
+import { getInternDataByEmail } from "@/lib/registry";
+
 const StatCard = ({ icon: Icon, label, value, color }: { icon: any; label: string; value: string; color: string }) => (
   <motion.div 
     whileHover={{ y: -5 }}
@@ -45,26 +48,57 @@ interface InternData {
 }
 
 export default function CommandCenter() {
+  const { user } = useUser();
   const [intern, setIntern] = useState<InternData | null>(null);
   const [fetchStatus, setFetchStatus] = useState<"loading" | "found" | "not_found">("loading");
 
   useEffect(() => {
     async function fetchInternData() {
+      if (!user) return;
+      
+      const email = user.emailAddresses[0]?.emailAddress;
+      
       try {
+        // 1. Try Cloud Native MongoDB
         const res = await fetch("/api/intern/me");
         if (res.ok) {
           const data = await res.json();
           setIntern(data);
           setFetchStatus("found");
-        } else {
-          setFetchStatus("not_found");
+          return;
         }
-      } catch {
+
+        // 2. Fallback to Local Legacy Registry if Cloud fetch fails
+        if (email) {
+          const legacyData = getInternDataByEmail(email);
+          if (legacyData) {
+            setIntern(legacyData as any);
+            setFetchStatus("found");
+            return;
+          }
+        }
+
+        setFetchStatus("not_found");
+      } catch (err) {
+        // 3. Last resort fallback on network failure
+        if (email) {
+          const legacyData = getInternDataByEmail(email);
+          if (legacyData) {
+            setIntern(legacyData as any);
+            setFetchStatus("found");
+            return;
+          }
+        }
         setFetchStatus("not_found");
       }
     }
-    fetchInternData();
-  }, []);
+
+    if (user) {
+      fetchInternData();
+    } else {
+      setFetchStatus("loading");
+    }
+  }, [user]);
 
   return (
     <div className="p-6 md:p-8 lg:p-12 space-y-10 max-w-7xl mx-auto">
