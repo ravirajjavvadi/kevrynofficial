@@ -32,7 +32,7 @@ const jobs = [
 
 export default function Careers() {
   return (
-    <div className="min-h-screen pt-32 pb-24 px-6 max-w-7xl mx-auto selection:bg-brand selection:text-black">
+    <div className="min-h-screen pt-12 pb-24 px-6 max-w-7xl mx-auto selection:bg-brand selection:text-black">
       {/* Background Glow */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand/5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full pointer-events-none" />

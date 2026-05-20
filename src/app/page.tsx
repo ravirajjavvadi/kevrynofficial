@@ -39,7 +39,7 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center min-h-screen selection:bg-brand selection:text-black overflow-hidden bg-background">
       
       {/* Cinematic Hero Section */}
-      <section className="relative w-full min-h-screen flex items-center justify-center pt-24 pb-12">
+      <section className="relative w-full min-h-[calc(100vh-96px)] flex items-center justify-center pb-12">
         {/* Background Visuals */}
         <div className="absolute inset-0 neural-grid opacity-[0.03] pointer-events-none" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-brand/10 blur-[150px] rounded-full pointer-events-none" />
