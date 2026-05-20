@@ -1,0 +1,6 @@
+{
+  "message": "Setting up fake worker failed: \"Cannot find package '[project]' imported from C:\\Users\\RAVIRAJ JAVVADI\\kevrynoff\\.next\\dev\\server\\chunks\\node_modules_pdfjs-dist_legacy_build_pdf_mjs_108wwko._.js\".",
+  "stack": "Error: Setting up fake worker failed: \"Cannot find package '[project]' imported from C:\\Users\\RAVIRAJ JAVVADI\\kevrynoff\\.next\\dev\\server\\chunks\\node_modules_pdfjs-dist_legacy_build_pdf_mjs_108wwko._.js\".\n    at C:\\Users\\RAVIRAJ JAVVADI\\kevrynoff\\.next\\dev\\server\\chunks\\node_modules_pdfjs-dist_legacy_build_pdf_mjs_108wwko._.js:20320:37\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)",
+  "name": "Error",
+  "full": "Error: Setting up fake worker failed: \"Cannot find package '[project]' imported from C:\\Users\\RAVIRAJ JAVVADI\\kevrynoff\\.next\\dev\\server\\chunks\\node_modules_pdfjs-dist_legacy_build_pdf_mjs_108wwko._.js\"."
+}
