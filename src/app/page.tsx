@@ -6,7 +6,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import React from "react"
-import { SignedIn, SignedOut } from "@clerk/nextjs"
+import { useUser } from "@clerk/nextjs"
 
 const FADE_UP_ANIMATION_VARIANTS: Variants = {
   hidden: { opacity: 0, y: 30 },
@@ -36,6 +36,8 @@ const FloatingIcon = ({ icon: Icon, delay, x, y, size = 48, color = "text-brand"
 )
 
 export default function Home() {
+  const { user, isLoaded } = useUser()
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen selection:bg-brand selection:text-black overflow-hidden bg-background">
       
@@ -95,41 +97,46 @@ export default function Home() {
               KevRyn is an autonomous AI production ecosystem. We are eliminating the barrier between ideation and deployment. Build the future, scale the impossible.
             </motion.p>
             
-            <motion.div variants={FADE_UP_ANIMATION_VARIANTS} className="flex flex-col sm:flex-row items-center gap-6">
-              <SignedOut>
-                <Link 
-                  href="/apply"
-                  className="group relative px-10 py-5 bg-brand text-black font-black text-sm uppercase tracking-widest rounded-2xl overflow-hidden transition-all hover:scale-105 shadow-[0_0_50px_var(--color-brand-glow)] active:scale-95"
-                >
-                  <div className="absolute inset-0 bg-white/30 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
-                  <span className="relative flex items-center gap-3">
-                    Initiate Protocol <Zap className="w-4 h-4 fill-current transition-transform group-hover:scale-125" />
-                  </span>
-                </Link>
-                <Link 
-                  href="/sign-in"
-                  className="px-10 py-5 rounded-2xl border border-border bg-card/40 backdrop-blur-xl text-foreground font-bold text-sm uppercase tracking-widest hover:bg-card/60 transition-all border-b-4 active:translate-y-1 active:border-b-0"
-                >
-                  Access Ecosystem
-                </Link>
-              </SignedOut>
-              <SignedIn>
-                <Link 
-                  href="/workspace"
-                  className="group relative px-10 py-5 bg-brand text-black font-black text-sm uppercase tracking-widest rounded-2xl overflow-hidden transition-all hover:scale-105 shadow-[0_0_50px_var(--color-brand-glow)] active:scale-95"
-                >
-                  <div className="absolute inset-0 bg-white/30 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
-                  <span className="relative flex items-center gap-3">
-                    Enter Command Center <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </Link>
-                <Link 
-                  href="/apply"
-                  className="px-10 py-5 rounded-2xl border border-border bg-card/40 backdrop-blur-xl text-foreground font-bold text-sm uppercase tracking-widest hover:bg-card/60 transition-all border-b-4 active:translate-y-1 active:border-b-0"
-                >
-                  New Application
-                </Link>
-              </SignedIn>
+            <motion.div variants={FADE_UP_ANIMATION_VARIANTS} className="flex flex-col sm:flex-row items-center gap-6 min-h-[80px]">
+              {!isLoaded ? (
+                <div className="w-48 h-12 bg-white/5 rounded-2xl animate-pulse" />
+              ) : user ? (
+                <>
+                  <Link 
+                    href="/workspace"
+                    className="group relative px-10 py-5 bg-brand text-black font-black text-sm uppercase tracking-widest rounded-2xl overflow-hidden transition-all hover:scale-105 shadow-[0_0_50px_var(--color-brand-glow)] active:scale-95"
+                  >
+                    <div className="absolute inset-0 bg-white/30 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+                    <span className="relative flex items-center gap-3">
+                      Enter Command Center <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </Link>
+                  <Link 
+                    href="/apply"
+                    className="px-10 py-5 rounded-2xl border border-border bg-card/40 backdrop-blur-xl text-foreground font-bold text-sm uppercase tracking-widest hover:bg-card/60 transition-all border-b-4 active:translate-y-1 active:border-b-0"
+                  >
+                    New Application
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    href="/apply"
+                    className="group relative px-10 py-5 bg-brand text-black font-black text-sm uppercase tracking-widest rounded-2xl overflow-hidden transition-all hover:scale-105 shadow-[0_0_50px_var(--color-brand-glow)] active:scale-95"
+                  >
+                    <div className="absolute inset-0 bg-white/30 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+                    <span className="relative flex items-center gap-3">
+                      Initiate Protocol <Zap className="w-4 h-4 fill-current transition-transform group-hover:scale-125" />
+                    </span>
+                  </Link>
+                  <Link 
+                    href="/sign-in"
+                    className="px-10 py-5 rounded-2xl border border-border bg-card/40 backdrop-blur-xl text-foreground font-bold text-sm uppercase tracking-widest hover:bg-card/60 transition-all border-b-4 active:translate-y-1 active:border-b-0"
+                  >
+                    Access Ecosystem
+                  </Link>
+                </>
+              )}
             </motion.div>
 
             {/* Live Metrics */}
