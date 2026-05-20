@@ -108,6 +108,7 @@ Answers Map: ${JSON.stringify(answers)}`;
                 const { db } = await import("@/lib/db");
                 await db.intern.create({
                    data: {
+                      id: internId!,
                       name: name,
                       email: email,
                       clerkId: clerkUserId,

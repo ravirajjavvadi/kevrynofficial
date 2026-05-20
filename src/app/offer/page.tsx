@@ -18,10 +18,26 @@ function OfferContent() {
   const [host, setHost] = useState("")
 
   useEffect(() => {
-    if (id) {
-      const result = getInternData(id)
-      setData(result)
+    async function fetchIntern() {
+      if (!id) return;
+      try {
+        const res = await fetch(`/api/intern/${id}`);
+        if (res.ok) {
+          const result = await res.json();
+          setData(result);
+        } else {
+          // Fallback to local storage for legacy tests
+          const localResult = getInternData(id);
+          setData(localResult);
+        }
+      } catch (err) {
+        console.error("Fetch failure:", err);
+        const localResult = getInternData(id);
+        setData(localResult);
+      }
     }
+    
+    fetchIntern();
     setHost(window.location.origin)
   }, [id])
 
