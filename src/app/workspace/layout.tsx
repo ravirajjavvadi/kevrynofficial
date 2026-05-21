@@ -1,11 +1,47 @@
 import React from "react";
 import Sidebar from "@/components/workspace/Sidebar";
+import { currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import { getDb } from "@/lib/db";
 
-export default function WorkspaceLayout({
+const ADMIN_WHITELIST = [
+  'ravirajjavvadhi@gmail.com',
+  'kevryntech@gmail.com'
+];
+
+export default async function WorkspaceLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const user = await currentUser();
+  const email = user?.emailAddresses[0]?.emailAddress || "";
+
+  if (!user) {
+    redirect("/");
+  }
+
+  // 1. Identity Verification Guard: Sovereign Lockdown
+  const isAdmin = ADMIN_WHITELIST.includes(email.toLowerCase());
+  
+  if (!isAdmin) {
+    try {
+      const db = await getDb();
+      // Only allow access if the intern exists in the official MongoDB registry
+      const intern = await db.collection("interns").findOne({ email: email.toLowerCase() });
+      
+      if (!intern) {
+        // If candidate is not in the recognized registry, block workspace entry
+        console.warn(`[SECURITY] Unauthorized Workspace Access Blocked for ${email}`);
+        redirect("/");
+      }
+    } catch (error) {
+      console.error("[SECURITY_GUARD_FAILURE]", error);
+      // Fail-secure: If DB check fails, redirect to protect the workspace
+      redirect("/");
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-[100] bg-background flex overflow-hidden">
       {/* Sidebar Navigation */}
