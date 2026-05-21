@@ -1,56 +1,46 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { 
   Search, 
   Filter, 
   Terminal, 
   Clock, 
-  AlertCircle,
-  MoreVertical,
-  ChevronRight
+  ChevronRight,
+  Zap
 } from "lucide-react";
 import TaskSubmitModal from "@/components/workspace/TaskSubmitModal";
 
-const MOCK_TASKS = [
-  {
-    id: "TASK-001",
-    title: "Develop Sovereign Social Interface for Complex Designers",
-    description: "Construct a high-fidelity dashboard component that handles real-time designer metrics with glassmorphism aesthetics.",
-    deadline: "2026-05-21T18:00:00Z",
-    priority: "HIGH",
-    status: "IN_PROGRESS",
-    domain: "Quantum Web"
-  },
-  {
-    id: "TASK-002",
-    title: "Optimize Neural Grid for Infinite Scaling",
-    description: "Refactor the current CSS grid to handle dynamic expansion without layout wobble on mobile viewports.",
-    deadline: "2026-05-23T12:00:00Z",
-    priority: "MEDIUM",
-    status: "IN_PROGRESS",
-    domain: "Neural Native"
-  },
-  {
-    id: "TASK-003",
-    title: "Implement Autonomous Code Auditor Logic",
-    description: "Build the server-side validator that audits GitHub repositories for sovereign best practices.",
-    deadline: "2026-05-20T10:00:00Z",
-    priority: "URGENT",
-    status: "UNDER_REVIEW",
-    domain: "Sovereign Backend"
-  }
-];
-
 export default function TasksPage() {
+  const [intern, setIntern] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    async function fetchTasks() {
+      try {
+        const res = await fetch("/api/intern/me");
+        if (res.ok) {
+          const data = await res.json();
+          setIntern(data);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchTasks();
+  }, []);
 
   const openSubmit = (task: any) => {
     setSelectedTask(task);
     setIsModalOpen(true);
   };
+
+  const tasks = intern?.tasks || [];
 
   return (
     <div className="p-8 lg:p-12 space-y-12 max-w-7xl mx-auto">
@@ -78,72 +68,77 @@ export default function TasksPage() {
 
       {/* Task List */}
       <div className="grid grid-cols-1 gap-6">
-        {MOCK_TASKS.map((task, idx) => (
-          <motion.div 
-            key={task.id}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: idx * 0.1 }}
-            className="p-10 rounded-[3rem] bg-white/[0.03] border border-white/10 hover:border-white/20 transition-all group relative overflow-hidden"
-          >
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
-              <div className="space-y-4 max-w-2xl">
-                <div className="flex items-center gap-3">
-                  <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest
-                    ${task.priority === 'URGENT' ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)]' : 
-                      task.priority === 'HIGH' ? 'bg-brand text-black shadow-[0_0_15px_var(--color-brand-glow)]' : 
-                      'bg-white/10 text-white'}
-                  `}>
-                    {task.priority} Priority
-                  </span>
-                  <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">{task.domain}</span>
+        {loading ? (
+          Array(3).fill(0).map((_, i) => (
+            <div key={i} className="p-10 rounded-[3rem] bg-white/[0.02] border border-white/5 animate-pulse h-64" />
+          ))
+        ) : tasks.length === 0 ? (
+          <div className="py-32 text-center space-y-6">
+            <Terminal className="w-16 h-16 text-white/5 mx-auto" />
+            <h2 className="text-xl font-black text-white/20 uppercase tracking-tighter">Queue Empty. Awaiting Administrative Deployment.</h2>
+          </div>
+        ) : (
+          tasks.map((task: any, idx: number) => (
+            <motion.div 
+              key={task.id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              className="p-10 rounded-[3rem] bg-white/[0.03] border border-white/10 hover:border-white/20 transition-all group relative overflow-hidden"
+            >
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
+                <div className="space-y-4 max-w-2xl">
+                  <div className="flex items-center gap-3">
+                    <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest
+                      ${task.priority === 'URGENT' || task.priority === 'HIGH' ? 'bg-brand text-black shadow-[0_0_15px_var(--color-brand-glow)]' : 
+                        'bg-white/10 text-white'}
+                    `}>
+                      {task.priority || 'Operational'}
+                    </span>
+                    <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">{task.domain || 'Core Logic'}</span>
+                  </div>
+                  
+                  <h2 className={`text-3xl font-black tracking-tighter leading-tight uppercase transition-all ${task.status === 'completed' ? 'text-white/40 line-through' : 'text-white group-hover:text-brand'}`}>
+                     {task.title}
+                  </h2>
+                  <p className="text-muted-foreground font-medium text-sm leading-relaxed">
+                     {task.description}
+                  </p>
+  
+                  <div className="flex items-center gap-6 pt-4">
+                    <div className="flex items-center gap-2 text-white/40">
+                      <Clock className="w-4 h-4" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Assigned: {task.assignedAt ? new Date(task.assignedAt).toLocaleDateString() : 'N/A'}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-white/40">
+                      <Terminal className="w-4 h-4" />
+                      <span className={`text-[10px] font-black uppercase tracking-widest ${task.status === 'completed' ? 'text-emerald-400' : 'text-muted-foreground'}`}>
+                        Status: {task.status || 'pending'}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                
-                <h2 className="text-3xl font-black text-white tracking-tighter leading-tight uppercase group-hover:text-brand transition-all">
-                   {task.title}
-                </h2>
-                <p className="text-muted-foreground font-medium text-sm leading-relaxed">
-                   {task.description}
-                </p>
-
-                <div className="flex items-center gap-6 pt-4">
-                  <div className="flex items-center gap-2 text-white/40">
-                    <Clock className="w-4 h-4" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Due: {new Date(task.deadline).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-white/40">
-                    <Terminal className="w-4 h-4" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Status: {task.status.replace('_', ' ')}</span>
-                  </div>
+  
+                <div className="flex lg:flex-col items-center gap-4">
+                   <button 
+                     onClick={() => openSubmit(task)}
+                     disabled={task.status === 'completed'}
+                     className={`flex-1 lg:w-full px-10 py-5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all
+                       ${task.status === 'completed' 
+                         ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 cursor-not-allowed' 
+                         : 'bg-brand text-black hover:scale-105 active:scale-95 shadow-[0_0_30px_var(--color-brand-glow)]'}
+                     `}
+                   >
+                     {task.status === 'completed' ? 'Protocol Executed' : 'Submit Solution'}
+                   </button>
                 </div>
               </div>
-
-              <div className="flex lg:flex-col items-center gap-4">
-                 <button 
-                   onClick={() => openSubmit(task)}
-                   className="flex-1 lg:w-full px-10 py-5 rounded-2xl bg-brand text-black font-black text-[10px] uppercase tracking-[0.2em] hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_var(--color-brand-glow)]"
-                 >
-                   Submit Solution
-                 </button>
-                 <button className="p-5 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-white hover:bg-white/10 transition-all">
-                   <MoreVertical className="w-5 h-5" />
-                 </button>
-              </div>
-            </div>
-
-            {/* Visual Decoration */}
-            <div className={`absolute -right-20 -bottom-20 w-80 h-80 blur-[120px] transition-all opacity-20
-              ${task.priority === 'URGENT' ? 'bg-red-500' : task.priority === 'HIGH' ? 'bg-brand' : 'bg-white'}
-            `} />
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Empty State / Load More */}
-      <div className="flex justify-center pt-8">
-        <button className="flex items-center gap-3 px-12 py-6 rounded-2xl border border-white/10 text-[10px] font-black text-white/40 uppercase tracking-[0.4em] hover:bg-white/5 transition-all">
-          Sync Historical Queue <ChevronRight className="w-4 h-4" />
-        </button>
+  
+              {/* Visual Decoration */}
+              <div className={`absolute -right-20 -bottom-20 w-80 h-80 blur-[120px] transition-all opacity-20 bg-brand`} />
+            </motion.div>
+          ))
+        )}
       </div>
 
       <TaskSubmitModal 

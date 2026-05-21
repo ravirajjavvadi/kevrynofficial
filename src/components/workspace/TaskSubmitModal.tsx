@@ -24,18 +24,27 @@ export default function TaskSubmitModal({ isOpen, onClose, task }: any) {
     setStatus("idle");
 
     try {
-      // Simulate Sovereign Audit & Submission
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // In Phase 5, this will call /api/workspace/submit
-      console.log("Submitting Task:", { taskId: task.id, repoUrl, deployUrl });
+      const res = await fetch("/api/workspace/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          taskId: task.id,
+          githubUrl: repoUrl,
+          deployUrl: deployUrl
+        })
+      });
+
+      if (!res.ok) throw new Error("Submission Failed");
       
       setStatus("success");
       setTimeout(() => {
         onClose();
         setStatus("idle");
+        // Reload to show updated status in UI
+        window.location.reload();
       }, 2000);
     } catch (err) {
+      console.error(err);
       setStatus("error");
     } finally {
       setIsSubmitting(false);
