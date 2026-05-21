@@ -6,15 +6,30 @@ const isProtectedRoute = createRouteMatcher([
   '/admin(.*)'
 ]);
 
-export default clerkMiddleware(async (auth, req) => {
-  const { userId } = await auth();
+const ADMIN_WHITELIST = [
+  'ravirajjavvadhi@gmail.com',
+  'kevryntech@gmail.com'
+];
 
-  // If user is logged in and trying to access the root '/', redirect to workspace
+export default clerkMiddleware(async (auth, req) => {
+  const { userId, sessionClaims } = await auth();
+  const email = (sessionClaims?.primary_email as string) || "";
+
+  // 1. Admin Lockdown: Only whitelisted emails can access /admin routes
+  if (req.nextUrl.pathname.startsWith('/admin')) {
+    if (!userId || !ADMIN_WHITELIST.includes(email.toLowerCase())) {
+      const homeUrl = new URL('/', req.url);
+      return Response.redirect(homeUrl);
+    }
+  }
+
+  // 2. Dashboard Redirect: Logged in users on '/' go to '/workspace'
   if (userId && req.nextUrl.pathname === '/') {
     const workspaceUrl = new URL('/workspace', req.url);
     return Response.redirect(workspaceUrl);
   }
 
+  // 3. Global Protection for /workspace and /admin (fallback)
   if (isProtectedRoute(req)) await auth.protect();
 });
 
