@@ -10,12 +10,7 @@ const isProtectedRoute = createRouteMatcher([
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
   
-  // 1. Dashboard Redirect: Logged in users on '/' go to '/workspace'
-  if (userId && req.nextUrl.pathname === '/') {
-    return NextResponse.redirect(new URL('/workspace', req.url));
-  }
-
-  // 2. Global Protection for /workspace and /admin
+  // 1. Global Protection for /workspace and /admin
   if (isProtectedRoute(req)) await auth.protect();
 });
 

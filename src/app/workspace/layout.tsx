@@ -25,12 +25,12 @@ export default async function WorkspaceLayout({
     if (!intern) {
       // No registry entry found. Absolute block.
       console.warn(`[SECURITY] Unauthorized Workspace Access Blocked for ${email}`);
-      redirect("/");
+      redirect("/unauthorized");
     }
   } catch (error) {
     if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) throw error;
     console.error("[SECURITY_GUARD_FAILURE]", error);
-    redirect("/");
+    redirect("/unauthorized");
   }
 
   return (
