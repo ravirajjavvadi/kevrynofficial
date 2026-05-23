@@ -7,7 +7,8 @@ import {
   Shield, User, Mail, Fingerprint, FileText, 
   Settings, Zap, CheckCircle2, Circle, 
   Plus, Trash2, ExternalLink, ArrowLeft,
-  Briefcase, Award, QrCode, Signature
+  Briefcase, Award, QrCode, Signature,
+  Clock
 } from "lucide-react";
 import Link from "next/link";
 
@@ -19,6 +20,8 @@ export default function InternDossierPage() {
   const [tasks, setTasks] = useState<any[]>([]);
   const [newTask, setNewTask] = useState({ title: "", description: "" });
   const [isAddingTask, setIsAddingTask] = useState(false);
+  const [editingTask, setEditingTask] = useState<string | null>(null);
+  const [editData, setEditData] = useState({ title: "", description: "" });
 
   useEffect(() => {
     async function fetchDetails() {
@@ -46,7 +49,7 @@ export default function InternDossierPage() {
         body: JSON.stringify(updatedData)
       });
       if (res.ok) {
-        setIntern({ ...intern, ...updatedData });
+        // Optimistic update already handled in state if needed, but here we just sync
       }
     } catch (err) {
       console.error(err);
@@ -57,21 +60,36 @@ export default function InternDossierPage() {
     if (!newTask.title) return;
     const taskObj = {
       id: Math.random().toString(36).substring(2, 9),
-      ...newTask,
+      title: newTask.title,
+      description: newTask.description,
       status: "pending",
       assignedAt: new Date().toISOString()
     };
     const newTasks = [...tasks, taskObj];
-    await handleUpdate({ tasks: newTasks });
     setTasks(newTasks);
+    await handleUpdate({ tasks: newTasks });
     setNewTask({ title: "", description: "" });
     setIsAddingTask(false);
   };
 
+  const startEdit = (task: any) => {
+    setEditingTask(task.id);
+    setEditData({ title: task.title, description: task.description });
+  };
+
+  const saveEdit = async () => {
+    const newTasks = tasks.map(t => 
+      t.id === editingTask ? { ...t, ...editData } : t
+    );
+    setTasks(newTasks);
+    await handleUpdate({ tasks: newTasks });
+    setEditingTask(null);
+  };
+
   const removeTask = async (taskId: string) => {
     const newTasks = tasks.filter(t => t.id !== taskId);
-    await handleUpdate({ tasks: newTasks });
     setTasks(newTasks);
+    await handleUpdate({ tasks: newTasks });
   };
 
   const toggleTaskStatus = async (taskId: string) => {
@@ -80,8 +98,8 @@ export default function InternDossierPage() {
         ? { ...t, status: t.status === "completed" ? "pending" : "completed" } 
         : t
     );
-    await handleUpdate({ tasks: newTasks });
     setTasks(newTasks);
+    await handleUpdate({ tasks: newTasks });
   };
 
   if (loading) return (
@@ -99,7 +117,7 @@ export default function InternDossierPage() {
   );
 
   return (
-    <div className="space-y-12 pb-24">
+    <div className="p-8 lg:p-12 space-y-12 pb-24 max-w-7xl mx-auto">
       {/* Breadcrumb */}
       <nav>
         <Link 
@@ -131,19 +149,22 @@ export default function InternDossierPage() {
                 <Mail className="w-3.5 h-3.5" /> {intern.email}
               </div>
               <div className="flex items-center gap-2 text-xs font-bold text-white/40">
-                <Fingerprint className="w-3.5 h-3.5" /> {intern.internId || intern._id.substring(0, 8).toUpperCase()}
+                <Fingerprint className="w-3.5 h-3.5" /> {intern.internId || intern._id.toUpperCase()}
               </div>
               <div className="flex items-center gap-2 text-xs font-bold text-white/40">
-                <Briefcase className="w-3.5 h-3.5" /> {intern.domain || 'Core Intelligence'}
+                <Briefcase className="w-3.5 h-3.5" /> {intern.domain || 'Quantum Engineering'}
               </div>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="px-6 py-3 rounded-2xl bg-white text-black font-black text-[10px] uppercase tracking-widest hover:scale-[1.02] transition-transform">
-            Approve Certificate
-          </button>
+          <Link 
+            href={`/admin/interns/${id}/certificate`}
+            className="px-6 py-3 rounded-2xl bg-white text-black font-black text-[10px] uppercase tracking-widest hover:scale-[1.02] transition-transform"
+          >
+            Award Excellence
+          </Link>
           <button className="px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-white transition-all">
             <Settings className="w-4 h-4" />
           </button>
@@ -153,14 +174,14 @@ export default function InternDossierPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Dossier Details */}
         <div className="lg:col-span-1 space-y-8">
-          <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-8">
+          <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-8 shadow-2xl">
             <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/40">Node Dossier</h3>
             
             <div className="space-y-6">
               {[
-                { label: 'Evaluation Score', value: `${intern.score || intern.iqScore || 0}%`, color: 'text-brand' },
-                { label: 'Onboarding Date', value: new Date(intern.createdAt).toLocaleDateString(), color: 'text-white/60' },
-                { label: 'Selected Status', value: 'Verified Node', color: 'text-emerald-400' },
+                { label: 'Evaluation Score', value: `${intern.score || intern.iqScore || 0}%`, color: 'text-red-500' },
+                { label: 'Onboarding Date', value: intern.createdAt ? new Date(intern.createdAt).toLocaleDateString() : 'Baseline', color: 'text-white/60' },
+                { label: 'Identity Status', value: 'Sovereign Verified', color: 'text-emerald-400' },
               ].map((item) => (
                 <div key={item.label} className="space-y-1">
                   <div className="text-[10px] font-black text-white/20 uppercase tracking-widest">{item.label}</div>
@@ -171,7 +192,7 @@ export default function InternDossierPage() {
 
             <div className="pt-6 border-t border-white/5">
               <h4 className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-4 flex items-center gap-2">
-                <FileText className="w-3 h-3" /> Identity Documents
+                <FileText className="w-3 h-3" /> Identity Archives
               </h4>
               <div className="space-y-3">
                 <a 
@@ -185,16 +206,17 @@ export default function InternDossierPage() {
                   </div>
                   <ExternalLink className="w-3 h-3 text-white/20 group-hover:text-white" />
                 </a>
-                <a 
-                  href="#" 
-                  className="flex items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/20 transition-all group cursor-not-allowed opacity-50"
+                <Link 
+                  href={`/offer?id=${intern.internId || intern._id}`} 
+                  target="_blank"
+                  className="flex items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/20 transition-all group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 text-white/40" />
-                    <span className="text-[10px] font-black text-white uppercase tracking-widest">Signed Offer.pdf</span>
+                    <Award className="w-4 h-4 text-emerald-400" />
+                    <span className="text-[10px] font-black text-white uppercase tracking-widest">Sovereign_Offer.pdf</span>
                   </div>
-                  <Zap className="w-3 h-3 text-emerald-400" />
-                </a>
+                  <ExternalLink className="w-3 h-3 text-white/20 group-hover:text-white" />
+                </Link>
               </div>
             </div>
           </div>
@@ -202,30 +224,32 @@ export default function InternDossierPage() {
 
         {/* Right Column: Task Orchestrator */}
         <div className="lg:col-span-2 space-y-8">
-          <div className="p-8 rounded-[3rem] bg-[#050505] border border-white/5 space-y-8">
-            <div className="flex items-center justify-between">
+          <div className="p-8 lg:p-12 rounded-[3rem] bg-[#050505] border border-white/5 space-y-10 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-red-500/5 blur-[100px] pointer-events-none" />
+            
+            <div className="flex items-center justify-between relative z-10">
               <div className="space-y-1">
-                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/40">Task Orchestrator</h3>
+                <h3 className="text-xl font-black text-white uppercase tracking-tighter">Task Orchestrator</h3>
                 <div className="text-[10px] font-black text-white/20 uppercase tracking-widest">
-                  Assign protocols and monitor execution
+                  Assign and moderate execution protocols
                 </div>
               </div>
               <button 
-                onClick={() => setIsAddingTask(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-500/20 transition-all"
+                onClick={() => setIsAddingTask(!isAddingTask)}
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-500 text-black text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_20px_rgba(239,68,68,0.2)]"
               >
-                <Plus className="w-3 h-3" /> New Task
+                <Plus className="w-3 h-3" /> Deploy Protocol
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6 relative z-10">
               <AnimatePresence>
                 {isAddingTask && (
                   <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="p-6 rounded-3xl bg-white/[0.02] border border-red-500/20 space-y-4"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="p-8 rounded-[2rem] bg-white/[0.02] border border-red-500/20 space-y-6"
                   >
                     <div className="space-y-4">
                       <input 
@@ -233,25 +257,25 @@ export default function InternDossierPage() {
                         placeholder="Task Protocol Title..."
                         value={newTask.title}
                         onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-                        className="w-full bg-black/40 border border-white/5 rounded-xl py-3 px-4 text-xs font-bold text-white outline-none focus:border-red-500/40 transition-all"
+                        className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-xs font-bold text-white outline-none focus:border-red-500 transition-all"
                       />
                       <textarea 
-                        placeholder="Detailed execution steps..."
+                        placeholder="Detailed execution requirements..."
                         value={newTask.description}
                         onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-                        className="w-full bg-black/40 border border-white/5 rounded-xl py-3 px-4 text-xs font-bold text-white outline-none focus:border-red-500/40 transition-all min-h-[100px]"
+                        className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-xs font-bold text-white outline-none focus:border-red-500 transition-all min-h-[120px] resize-none"
                       />
                     </div>
                     <div className="flex items-center gap-3">
                       <button 
                         onClick={addTask}
-                        className="px-6 py-2 rounded-xl bg-white text-black font-black text-[10px] uppercase tracking-widest"
+                        className="px-8 py-3 rounded-xl bg-white text-black font-black text-[10px] uppercase tracking-widest hover:bg-red-500 transition-all"
                       >
                         Deploy Task
                       </button>
                       <button 
                         onClick={() => setIsAddingTask(false)}
-                        className="px-6 py-2 rounded-xl bg-white/5 text-white/40 font-black text-[10px] uppercase tracking-widest hover:text-white"
+                        className="px-8 py-3 rounded-xl bg-white/5 text-white/40 font-black text-[10px] uppercase tracking-widest hover:text-white"
                       >
                         Cancel
                       </button>
@@ -260,47 +284,114 @@ export default function InternDossierPage() {
                 )}
               </AnimatePresence>
 
-              {tasks.length === 0 ? (
-                <div className="py-20 text-center space-y-4 opacity-20">
-                  <Zap className="w-12 h-12 mx-auto" />
-                  <div className="text-[10px] font-black uppercase tracking-widest">No active tasks assigned to this node</div>
-                </div>
-              ) : (
-                tasks.map((task) => (
-                  <div key={task.id} className="group p-6 rounded-3xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all flex items-start gap-4">
-                    <button 
-                      onClick={() => toggleTaskStatus(task.id)}
-                      className={`mt-1 transition-colors ${task.status === 'completed' ? 'text-emerald-400' : 'text-white/20 hover:text-white/40'}`}
-                    >
-                      {task.status === 'completed' ? <CheckCircle2 className="w-5 h-5" /> : <Circle className="w-5 h-5" />}
-                    </button>
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <h4 className={`text-sm font-black uppercase tracking-tighter transition-all ${task.status === 'completed' ? 'text-white/40 line-through' : 'text-white'}`}>
-                          {task.title}
-                        </h4>
-                        <div className="flex items-center gap-2">
-                           {task.submission && (
-                             <a href={task.submission.github} target="_blank" className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-all">
-                               <ExternalLink className="w-3 h-3" />
-                             </a>
-                           )}
-                           <button 
-                             onClick={() => removeTask(task.id)}
-                             className="p-2 rounded-lg bg-red-500/0 text-white/10 hover:text-red-500 hover:bg-red-500/10 transition-all opacity-0 group-hover:opacity-100"
-                           >
-                             <Trash2 className="w-3 h-3" />
-                           </button>
-                        </div>
-                      </div>
-                      <p className="text-[10px] font-medium text-white/40 leading-relaxed italic">{task.description}</p>
-                      <div className="text-[8px] font-black text-white/10 uppercase tracking-widest uppercase">
-                        Assigned: {task.assignedAt ? new Date(task.assignedAt).toLocaleString() : 'N/A'}
-                      </div>
-                    </div>
+              <div className="space-y-4">
+                {tasks.length === 0 ? (
+                  <div className="py-32 text-center space-y-6 opacity-10">
+                    <Zap className="w-16 h-16 mx-auto" />
+                    <div className="text-xs font-black uppercase tracking-[0.3em]">No protocols deployed to this node</div>
                   </div>
-                ))
-              )}
+                ) : (
+                  tasks.map((task) => (
+                    <motion.div 
+                      key={task.id} 
+                      layout
+                      className={`group p-8 rounded-[2rem] bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all flex items-start gap-6 relative
+                        ${editingTask === task.id ? 'border-red-500/30 ring-1 ring-red-500/20' : ''}`}
+                    >
+                      <button 
+                        onClick={() => toggleTaskStatus(task.id)}
+                        className={`mt-1 transition-all hover:scale-110 ${task.status === 'completed' ? 'text-emerald-400' : 'text-white/20 hover:text-red-500'}`}
+                      >
+                        {task.status === 'completed' ? <CheckCircle2 className="w-6 h-6" /> : <Circle className="w-6 h-6" />}
+                      </button>
+                      
+                      <div className="flex-1 space-y-4">
+                        {editingTask === task.id ? (
+                          <div className="space-y-4">
+                            <input 
+                              value={editData.title}
+                              onChange={(e) => setEditData({...editData, title: e.target.value})}
+                              className="w-full bg-black border border-white/10 rounded-xl p-3 text-xs font-bold text-white outline-none focus:border-red-500"
+                            />
+                            <textarea 
+                              value={editData.description}
+                              onChange={(e) => setEditData({...editData, description: e.target.value})}
+                              className="w-full bg-black border border-white/10 rounded-xl p-3 text-xs font-bold text-white outline-none focus:border-red-500 resize-none"
+                            />
+                            <div className="flex gap-2">
+                              <button onClick={saveEdit} className="px-4 py-2 rounded-lg bg-red-500 text-black text-[10px] font-black uppercase">Save Change</button>
+                              <button onClick={() => setEditingTask(null)} className="px-4 py-2 rounded-lg bg-white/5 text-white/40 text-[10px] font-black uppercase">Discard</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex items-center justify-between">
+                              <h4 className={`text-lg font-black uppercase tracking-tighter transition-all ${task.status === 'completed' ? 'text-white/40 line-through' : 'text-white'}`}>
+                                {task.title}
+                              </h4>
+                              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                 <button 
+                                   onClick={() => startEdit(task)}
+                                   className="p-2 rounded-lg bg-white/5 text-white/40 hover:text-white"
+                                 >
+                                   <Settings className="w-3.5 h-3.5" />
+                                 </button>
+                                 <button 
+                                   onClick={() => removeTask(task.id)}
+                                   className="p-2 rounded-lg bg-red-500/0 text-white/10 hover:text-red-500 hover:bg-red-500/10 transition-all font-black text-xs"
+                                 >
+                                   <Trash2 className="w-3.5 h-3.5" />
+                                 </button>
+                              </div>
+                            </div>
+                            <p className="text-xs font-medium text-white/40 leading-relaxed max-w-xl">{task.description}</p>
+                            
+                            <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-white/5 mt-4">
+                              <div className="text-[10px] font-black text-white/30 uppercase tracking-widest flex items-center gap-2">
+                                <Clock className="w-3 h-3" /> Assigned: {task.assignedAt ? new Date(task.assignedAt).toLocaleDateString() : 'Baseline'}
+                              </div>
+                              
+                              {task.submission && (
+                                <div className="flex items-center gap-4">
+                                  <a 
+                                    href={task.submission.github} 
+                                    target="_blank" 
+                                    className="px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2 hover:bg-emerald-500/20 transition-all"
+                                  >
+                                    <ExternalLink className="w-3 h-3" /> Repository
+                                  </a>
+                                  {task.submission.deploy && (
+                                    <a 
+                                      href={task.submission.deploy} 
+                                      target="_blank" 
+                                      className="px-3 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[10px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-2 hover:bg-blue-500/20 transition-all"
+                                    >
+                                      <Zap className="w-3 h-3" /> Live Deploy
+                                    </a>
+                                  )}
+                                  <div className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em] flex flex-col">
+                                    <span>Submitted</span>
+                                    <span>{new Date(task.submission.timestamp).toLocaleString()}</span>
+                                  </div>
+                                  
+                                  {task.status !== 'completed' && (
+                                    <button 
+                                      onClick={() => toggleTaskStatus(task.id)}
+                                      className="px-4 py-1.5 rounded-lg bg-emerald-500 text-black text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all"
+                                    >
+                                      Approve Solution
+                                    </button>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
         </div>

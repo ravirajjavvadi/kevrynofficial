@@ -23,14 +23,20 @@ export async function GET(
     const { id } = await params;
     const db = await getDb();
     
-    // Attempt to find by ID or Email if ID is complex
-    let intern;
-    try {
-      intern = await db.collection("interns").findOne({ _id: new ObjectId(id) });
-    } catch {
-      // Fallback to searching by email if ID is not a valid ObjectId (e.g. legacy lookup)
-      intern = await db.collection("interns").findOne({ email: id });
+    // Attempt to find by ObjectId, Email, or Custom internId
+    const query: any = {
+      $or: [
+        { email: id },
+        { internId: id }
+      ]
+    };
+
+    // Only add ObjectId search if id is a valid hex string for ObjectId
+    if (id.match(/^[0-9a-fA-F]{24}$/)) {
+      query.$or.push({ _id: new ObjectId(id) });
     }
+
+    const intern = await db.collection("interns").findOne(query);
 
     if (!intern) {
       return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
@@ -68,18 +74,18 @@ export async function PATCH(
       $set: { ...body, updatedAt: new Date() }
     };
 
-    let result;
-    try {
-      result = await db.collection("interns").updateOne(
-        { _id: new ObjectId(id) },
-        updateDoc
-      );
-    } catch {
-      result = await db.collection("interns").updateOne(
+    const query: any = {
+      $or: [
         { email: id },
-        updateDoc
-      );
+        { internId: id }
+      ]
+    };
+
+    if (id.match(/^[0-9a-fA-F]{24}$/)) {
+      query.$or.push({ _id: new ObjectId(id) });
     }
+
+    const result = await db.collection("interns").updateOne(query, updateDoc);
 
     return NextResponse.json({ success: true, result });
 
