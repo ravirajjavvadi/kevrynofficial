@@ -42,8 +42,8 @@ export const getSelectionEmail = (name: string, role: string, loginUrl: string, 
             
             <div class="credentials">
                 <div class="cred-item">
-                    <span class="cred-label">Platform URL</span>
-                    <span class="cred-value">kevryn.ai/workspace</span>
+                    <span class="cred-label">Platform Entry</span>
+                    <a href="${loginUrl}" style="color: #00d2ff; text-decoration: none; font-size: 14px; font-weight: 700;">Click here to Access Workspace</a>
                 </div>
                 <div class="cred-item">
                     <span class="cred-label">Login Account</span>
