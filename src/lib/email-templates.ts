@@ -3,7 +3,7 @@
  * Designed for KevRyn Technologies
  */
 
-export const getSelectionEmail = (name: string, role: string, loginUrl: string, id: string) => `
+export const getSelectionEmail = (name: string, role: string, loginUrl: string, id: string, internPwd?: string) => `
 <!DOCTYPE html>
 <html>
 <head>
@@ -46,16 +46,18 @@ export const getSelectionEmail = (name: string, role: string, loginUrl: string, 
                     <span class="cred-value">kevryn.ai/workspace</span>
                 </div>
                 <div class="cred-item">
-                    <span class="cred-label">Access Protocol</span>
-                    <span class="cred-value">Secure Auth via Your Email</span>
+                    <span class="cred-label">Login Account</span>
+                    <span class="cred-value">Your Email</span>
                 </div>
+                ${internPwd ? `
                 <div class="cred-item">
-                    <span class="cred-label">Registration ID</span>
-                    <span class="cred-value">${id.slice(-8).toUpperCase()}</span>
+                    <span class="cred-label">Generated Password</span>
+                    <span class="cred-value" style="color: #00d2ff;">${internPwd}</span>
                 </div>
+                ` : ''}
             </div>
 
-            <a href="${loginUrl}" class="cta-button">View Official Offer Letter</a>
+            <a href="${loginUrl}" class="cta-button">Access OS Workspace</a>
             
             <p style="margin-top: 30px; font-size: 12px;">Welcome to the ecosystem where AI innovation meets absolute sovereign engineering. We look forward to your contributions.</p>
         </div>
