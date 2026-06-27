@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -14,12 +14,10 @@ export async function GET(
       return NextResponse.json({ error: "MISSING_ID" }, { status: 400 });
     }
 
-    const intern = await db.intern.findUnique({
-      where: { id },
-      include: {
-        submissions: true,
-      },
-    });
+    const db = await getDb();
+    
+    // Find intern by our custom ID (mapped to _id in Mongo)
+    const intern = await db.collection("interns").findOne({ _id: id as any });
 
     if (!intern) {
       return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
