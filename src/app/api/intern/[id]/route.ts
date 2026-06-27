@@ -23,7 +23,13 @@ export async function GET(
       return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
     }
 
-    return NextResponse.json(intern);
+    // Map MongoDB _id back to id for Frontend compatibility
+    const responseData = {
+      ...intern,
+      id: intern._id
+    };
+
+    return NextResponse.json(responseData);
   } catch (err: any) {
     console.error("[INTERN FETCH ERROR]", err);
     return NextResponse.json(
