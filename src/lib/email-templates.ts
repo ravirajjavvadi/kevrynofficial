@@ -3,7 +3,7 @@
  * Designed for KevRyn Technologies
  */
 
-export const getSelectionEmail = (name: string, role: string, loginUrl: string, id: string, internPwd?: string) => `
+export const getSelectionEmail = (name: string, role: string, workspaceUrl: string, offerUrl: string, id: string, internPwd?: string) => `
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,10 +18,11 @@ export const getSelectionEmail = (name: string, role: string, loginUrl: string, 
         p { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.7); margin-bottom: 20px; }
         .role-badge { display: inline-block; background: rgba(0, 210, 255, 0.1); border: 1px solid #00d2ff; color: #00d2ff; padding: 4px 12px; border-radius: 100px; font-size: 10px; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; }
         .credentials { background-color: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; margin-bottom: 30px; }
-        .cred-item { margin-bottom: 15px; }
-        .cred-label { font-size: 10px; font-weight: 900; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; display: block; }
+        .cred-item { margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); pb: 10px; }
+        .cred-label { font-size: 10px; font-weight: 900; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
         .cred-value { font-size: 16px; font-weight: 700; color: #FFFFFF; font-family: monospace; }
-        .cta-button { display: block; background: #00d2ff; color: #000; text-align: center; padding: 16px; border-radius: 12px; font-weight: 900; text-decoration: none; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+        .cta-button { display: block; background: #00d2ff; color: #000; text-align: center; padding: 16px; border-radius: 12px; font-weight: 900; text-decoration: none; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; margin-bottom: 15px; }
+        .secondary-button { display: block; background: rgba(255,255,255,0.05); color: #FFF; text-align: center; padding: 16px; border-radius: 12px; font-weight: 900; text-decoration: none; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.1); }
         .footer { padding: 20px 40px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; }
         .footer-text { font-size: 10px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1.5px; }
     </style>
@@ -38,26 +39,27 @@ export const getSelectionEmail = (name: string, role: string, loginUrl: string, 
             <p>Following your exceptional performance in our Qualifier Arena, we are pleased to officially extend an offer for the following role:</p>
             <div class="role-badge">${role}</div>
             
-            <p>Your unique digital offer is ready for review. Access your credentials below to enter the Sovereign Intern OS:</p>
+            <p>Your unique digital offer and workspace credentials have been synchronized. Access them below:</p>
             
             <div class="credentials">
                 <div class="cred-item">
-                    <span class="cred-label">Platform Entry</span>
-                    <a href="${loginUrl}" style="color: #00d2ff; text-decoration: none; font-size: 14px; font-weight: 700;">Click here to Access Workspace</a>
-                </div>
-                <div class="cred-item">
                     <span class="cred-label">Login Account</span>
-                    <span class="cred-value">Your Email</span>
+                    <span class="cred-value">Your Email Address</span>
                 </div>
                 ${internPwd ? `
                 <div class="cred-item">
-                    <span class="cred-label">Generated Password</span>
+                    <span class="cred-label">Temporary Access Password</span>
                     <span class="cred-value" style="color: #00d2ff;">${internPwd}</span>
                 </div>
                 ` : ''}
+                <div class="cred-item">
+                    <span class="cred-label">Registry ID</span>
+                    <span class="cred-value">${id}</span>
+                </div>
             </div>
 
-            <a href="${loginUrl}" class="cta-button">Access OS Workspace</a>
+            <a href="${offerUrl}" class="cta-button">View Official Offer Letter</a>
+            <a href="${workspaceUrl}" class="secondary-button">Access Intern Workspace</a>
             
             <p style="margin-top: 30px; font-size: 12px;">Welcome to the ecosystem where AI innovation meets absolute sovereign engineering. We look forward to your contributions.</p>
         </div>

@@ -139,10 +139,11 @@ Answers Map: ${JSON.stringify(answers)}`;
     // 3. Automated Onboarding Email (Resend)
     try {
       const host = req.headers.get("origin") || "https://kevryn.ai";
-      const loginUrl = internId ? `${host}/offer?id=${internId}` : host;
+      const offerUrl = internId ? `${host}/offer?id=${internId}` : host;
+      const workspaceUrl = `${host}/workspace`;
 
       const emailHtml = (result.verdict === "ADMITTED" && internId)
-        ? getSelectionEmail(name, role, loginUrl, internId, tempPwd)
+        ? getSelectionEmail(name, role, workspaceUrl, offerUrl, internId, tempPwd)
         : getRejectionEmail(name, role);
 
       await transporter.sendMail({
