@@ -16,12 +16,27 @@ export default function VerificationPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Small delay to simulate "Neural Verification"
-    setTimeout(() => {
-      const result = getInternData(id)
-      setData(result)
-      setIsLoading(false)
-    }, 1500)
+    async function verifyIntern() {
+      try {
+        const res = await fetch(`/api/intern/${id}`);
+        if (res.ok) {
+          const result = await res.json();
+          setData(result);
+        } else {
+          // Legacy Fallback
+          const localResult = getInternData(id);
+          setData(localResult);
+        }
+      } catch (err) {
+        console.error("Verification error:", err);
+        const localResult = getInternData(id);
+        setData(localResult);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    
+    verifyIntern();
   }, [id])
 
   if (isLoading) {
