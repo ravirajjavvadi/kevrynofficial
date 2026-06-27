@@ -75,7 +75,7 @@ export default function WorkspaceSidebar() {
            <div className="p-2 rounded-xl border border-transparent group-hover:border-red-500/20">
              <LogOut className="w-5 h-5" />
            </div>
-           <span className="text-xs font-black uppercase tracking-widest hidden lg:block">Terminate Sync</span>
+           <span className="text-xs font-black uppercase tracking-widest hidden lg:block">Sign Out / End Session</span>
         </button>
       </div>
 

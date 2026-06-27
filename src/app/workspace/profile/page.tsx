@@ -2,11 +2,12 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { User, Shield, Key, Fingerprint, Hexagon } from "lucide-react";
-import { useUser } from "@clerk/nextjs";
+import { User, Shield, Key, Fingerprint, Hexagon, LogOut } from "lucide-react";
+import { useUser, useClerk } from "@clerk/nextjs";
 
 export default function ProfilePage() {
   const { user } = useUser();
+  const { signOut } = useClerk();
 
   return (
     <div className="p-8 lg:p-12 max-w-4xl mx-auto space-y-12">
@@ -89,6 +90,33 @@ export default function ProfilePage() {
             </div>
           </div>
           <button className="px-6 py-2 rounded-xl bg-white/5 text-white/60 text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-colors border border-white/10">Configure</button>
+        </div>
+      </motion.div>
+
+      {/* Session Management */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="space-y-6"
+      >
+        <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/40 px-4">Session Management</h3>
+        <div className="p-6 rounded-[2rem] bg-red-500/5 border border-red-500/20 flex items-center justify-between group hover:bg-red-500/10 transition-all">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-red-500/10 rounded-xl text-red-500">
+              <LogOut className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-sm font-bold text-white uppercase">Terminate Session</div>
+              <div className="text-xs font-medium text-white/40">Securely sign out and end your neural sync.</div>
+            </div>
+          </div>
+          <button 
+            onClick={() => signOut()}
+            className="px-8 py-3 rounded-xl bg-red-500 text-black text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(239,68,68,0.3)]"
+          >
+            Sign Out Now
+          </button>
         </div>
       </motion.div>
     </div>
