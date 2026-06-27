@@ -6,6 +6,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import React from "react"
+import { SignedIn, SignedOut } from "@clerk/nextjs"
 
 const FADE_UP_ANIMATION_VARIANTS: Variants = {
   hidden: { opacity: 0, y: 30 },
@@ -45,7 +46,7 @@ export default function Home() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-brand/10 blur-[150px] rounded-full pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-full h-[30vh] bg-gradient-to-t from-background to-transparent pointer-events-none" />
 
-        {/* Floating Code Stack - Inspired by provided image */}
+        {/* Floating Icons */}
         <FloatingIcon icon={Terminal} delay={0.2} x="15%" y="20%" size={40} color="text-yellow-400" />
         <FloatingIcon icon={Code} delay={0.5} x="80%" y="25%" size={36} color="text-brand" />
         <FloatingIcon icon={Cpu} delay={0.8} x="10%" y="70%" size={44} color="text-accent" />
@@ -95,24 +96,43 @@ export default function Home() {
             </motion.p>
             
             <motion.div variants={FADE_UP_ANIMATION_VARIANTS} className="flex flex-col sm:flex-row items-center gap-6">
-              <Link 
-                href="/apply"
-                className="group relative px-10 py-5 bg-brand text-black font-black text-sm uppercase tracking-widest rounded-2xl overflow-hidden transition-all hover:scale-105 shadow-[0_0_50px_var(--color-brand-glow)] active:scale-95"
-              >
-                <div className="absolute inset-0 bg-white/30 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
-                <span className="relative flex items-center gap-3">
-                  Initiate Protocol <Zap className="w-4 h-4 fill-current transition-transform group-hover:scale-125" />
-                </span>
-              </Link>
-              <Link 
-                href="/features"
-                className="px-10 py-5 rounded-2xl border border-border bg-card/40 backdrop-blur-xl text-foreground font-bold text-sm uppercase tracking-widest hover:bg-card/60 transition-all border-b-4 active:translate-y-1 active:border-b-0"
-              >
-                Access Ecosystem
-              </Link>
+              <SignedOut>
+                <Link 
+                  href="/apply"
+                  className="group relative px-10 py-5 bg-brand text-black font-black text-sm uppercase tracking-widest rounded-2xl overflow-hidden transition-all hover:scale-105 shadow-[0_0_50px_var(--color-brand-glow)] active:scale-95"
+                >
+                  <div className="absolute inset-0 bg-white/30 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+                  <span className="relative flex items-center gap-3">
+                    Initiate Protocol <Zap className="w-4 h-4 fill-current transition-transform group-hover:scale-125" />
+                  </span>
+                </Link>
+                <Link 
+                  href="/sign-in"
+                  className="px-10 py-5 rounded-2xl border border-border bg-card/40 backdrop-blur-xl text-foreground font-bold text-sm uppercase tracking-widest hover:bg-card/60 transition-all border-b-4 active:translate-y-1 active:border-b-0"
+                >
+                  Access Ecosystem
+                </Link>
+              </SignedOut>
+              <SignedIn>
+                <Link 
+                  href="/workspace"
+                  className="group relative px-10 py-5 bg-brand text-black font-black text-sm uppercase tracking-widest rounded-2xl overflow-hidden transition-all hover:scale-105 shadow-[0_0_50px_var(--color-brand-glow)] active:scale-95"
+                >
+                  <div className="absolute inset-0 bg-white/30 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+                  <span className="relative flex items-center gap-3">
+                    Enter Command Center <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </Link>
+                <Link 
+                  href="/apply"
+                  className="px-10 py-5 rounded-2xl border border-border bg-card/40 backdrop-blur-xl text-foreground font-bold text-sm uppercase tracking-widest hover:bg-card/60 transition-all border-b-4 active:translate-y-1 active:border-b-0"
+                >
+                  New Application
+                </Link>
+              </SignedIn>
             </motion.div>
 
-            {/* Live Metrics Simulation */}
+            {/* Live Metrics */}
             <motion.div 
               variants={FADE_UP_ANIMATION_VARIANTS}
               className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-12 border-t border-border/50 pt-16 w-full max-w-5xl"
@@ -133,7 +153,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Futuristic Feature Matrix */}
+      {/* Feature Matrix */}
       <section className="w-full py-32 relative z-10 border-t border-border bg-background transition-colors duration-500">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
@@ -175,7 +195,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Proactive CTA Section */}
+      {/* CTA Section */}
       <section className="w-full py-48 relative overflow-hidden">
         <div className="absolute inset-0 beast-gradient opacity-[0.03] pointer-events-none" />
         <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
