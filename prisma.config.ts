@@ -1,5 +1,7 @@
 import { defineConfig } from "prisma/config";
-import "dotenv/config";
+import { config } from "dotenv";
+
+config({ path: ".env.local" });
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
