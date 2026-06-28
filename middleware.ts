@@ -1,4 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
 // Define routes that require authentication
 const isProtectedRoute = createRouteMatcher([
@@ -13,20 +14,19 @@ const ADMIN_WHITELIST = [
 
 export default clerkMiddleware(async (auth, req) => {
   const { userId, sessionClaims } = await auth();
-  const email = (sessionClaims?.primary_email as string) || "";
-
+  
   // 1. Admin Lockdown: Only whitelisted emails can access /admin routes
   if (req.nextUrl.pathname.startsWith('/admin')) {
+    const email = (sessionClaims?.primary_email as string) || "";
+    
     if (!userId || !ADMIN_WHITELIST.includes(email.toLowerCase())) {
-      const homeUrl = new URL('/', req.url);
-      return Response.redirect(homeUrl);
+      return NextResponse.redirect(new URL('/', req.url));
     }
   }
 
   // 2. Dashboard Redirect: Logged in users on '/' go to '/workspace'
   if (userId && req.nextUrl.pathname === '/') {
-    const workspaceUrl = new URL('/workspace', req.url);
-    return Response.redirect(workspaceUrl);
+    return NextResponse.redirect(new URL('/workspace', req.url));
   }
 
   // 3. Global Protection for /workspace and /admin (fallback)
