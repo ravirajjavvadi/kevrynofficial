@@ -9,7 +9,7 @@ const jobs = [
     title: "AI Infrastructure Engineer", 
     type: "Full-Time", 
     location: "Remote / Bengaluru", 
-    desc: "Build the core autonomous engine that powers KevRyn IDE. Experience with LLMs, CUDA, and distributed systems required.",
+    desc: "Build the core autonomous engine that powers KarsaTek OS IDE. Experience with LLMs, CUDA, and distributed systems required.",
     icon: Brain 
   },
   { 

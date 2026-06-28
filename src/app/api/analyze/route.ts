@@ -1,15 +1,51 @@
 import { NextRequest, NextResponse } from "next/server";
-import Groq from "groq-sdk";
+import { runCascadeFlow } from "@/lib/cascadeflow";
+import zlib from "zlib";
 
 export const maxDuration = 60; // Extend Vercel runtime to 60 seconds
-
 
 // Workaround for pdf-parse browser-API dependencies in Node environment
 if (typeof global.DOMMatrix === "undefined") {
   (global as any).DOMMatrix = class DOMMatrix {};
 }
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+function render_page(pageData: any): Promise<string> {
+  const render_options = {
+    normalizeWhitespace: false,
+    disableCombineTextItems: false
+  };
+
+  return pageData.getTextContent(render_options)
+    .then(function(textContent: any) {
+      let lastY, text = '';
+      for (const item of textContent.items) {
+        if (lastY === item.transform[5] || !lastY){
+          text += item.str;
+        } else {
+          text += '\n' + item.str;
+        }    
+        lastY = item.transform[5];
+      }            
+      return text;
+    });
+}
+
+async function parsePdfStatically(dataBuffer: Uint8Array): Promise<string> {
+  const PDFJS = require("pdf-parse/lib/pdf.js/v1.10.100/build/pdf.js");
+  PDFJS.disableWorker = true;
+  
+  const doc = await PDFJS.getDocument(dataBuffer);
+  const numPages = doc.numPages;
+  let text = "";
+
+  for (let i = 1; i <= numPages; i++) {
+    const pageText = await doc.getPage(i).then((pageData: any) => render_page(pageData)).catch(() => "");
+    text = `${text}\n\n${pageText}`;
+  }
+
+  doc.destroy();
+  return text;
+}
 
 const ROLE_REQUIREMENTS: Record<string, string> = {
   "ai-engineer": "Deep learning, LLMs, Python, CUDA, PyTorch, distributed systems, FastAPI, model fine-tuning",
@@ -23,6 +59,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
     const role = (formData.get("role") as string) || "unspecified";
+    const clientExtractedText = formData.get("extractedText") as string | null;
 
     if (!file) {
       return NextResponse.json(
@@ -43,21 +80,44 @@ export async function POST(req: NextRequest) {
     const buffer = new Uint8Array(arrayBuffer);
     let resumeText = "";
 
-    try {
-      // Use unpdf for ultra-stable extraction in Next.js (no worker issues)
-      const { extractText } = await import("unpdf");
-      const { text } = await extractText(buffer);
-      resumeText = Array.isArray(text) ? text.join("\n") : text;
-    } catch (err: any) {
-      console.error("[PDF EXTRACTION ERROR]", err);
-      return NextResponse.json(
-        { 
-          error: "EXTRACTION_FAILED", 
-          message: "Could not read PDF. Ensure the file is not encrypted.", 
-          details: err?.message || String(err) 
-        },
-        { status: 422 }
-      );
+    if (clientExtractedText && clientExtractedText.trim().length >= 50) {
+      resumeText = clientExtractedText;
+      console.log("[API] Using client-side pre-extracted text, length:", resumeText.length);
+    } else {
+      try {
+        // 1. Try our build-safe static PDFJS parser first (runs 100% serverless-safe)
+        resumeText = await parsePdfStatically(buffer);
+        console.log("[STATIC PDFJS SUCCESS] Extracted length:", resumeText.length);
+      } catch (staticErr) {
+        console.warn("[STATIC PDFJS FAILED] Falling back to unpdf:", staticErr);
+      }
+
+      // 2. Fallback to unpdf if custom parser fails or returns empty result
+      if (!resumeText || resumeText.length < 50) {
+        try {
+          const { extractText } = await import("unpdf");
+          const { text } = await extractText(buffer);
+          resumeText = Array.isArray(text) ? text.join("\n") : text;
+          console.log("[UNPDF FALLBACK SUCCESS] Extracted length:", resumeText.length);
+        } catch (unpdfErr: any) {
+          console.error("[ALL PARSERS FAILED]", unpdfErr);
+          // Fallback to basic ASCII extraction if everything fails
+          try {
+            const pdfString = Buffer.from(buffer).toString("binary");
+            const plainTextMatches = pdfString.match(/[a-zA-Z0-9\s,.]{4,}/g);
+            resumeText = plainTextMatches ? plainTextMatches.join(" ") : "";
+            console.log("[ASCII FALLBACK SUCCESS] Extracted length:", resumeText.length);
+          } catch (asciiErr) {
+            return NextResponse.json(
+              { 
+                error: "EXTRACTION_FAILED", 
+                message: "Could not read PDF. Ensure the file is not encrypted."
+              },
+              { status: 422 }
+            );
+          }
+        }
+      }
     }
 
     if (!resumeText.trim() || resumeText.trim().length < 50) {
@@ -73,7 +133,7 @@ export async function POST(req: NextRequest) {
 
     const roleRequirements = ROLE_REQUIREMENTS[role] || ROLE_REQUIREMENTS["unspecified"];
 
-    const systemPrompt = `You are KevRyn's Neural Recruitment Engine — an elite AI ATS system. 
+    const systemPrompt = `You are KarsaTek OS's Neural Recruitment Engine — an elite AI ATS system. 
 Your job is to analyze a candidate's resume against a specific role and produce a structured evaluation.
 You MUST respond ONLY with a valid JSON object. No markdown, no explanation, no preamble.
 The JSON must follow this exact schema:
@@ -100,17 +160,18 @@ ${resumeText.slice(0, 6000)}
 
 Evaluate and return the JSON.`;
 
-    const chatCompletion = await groq.chat.completions.create({
+    const result = await runCascadeFlow({
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
-      model: "llama-3.3-70b-versatile",
+      priority: "LIGHT",
       temperature: 0.3,
       max_tokens: 800,
+      response_format: { type: "json_object" }
     });
 
-    const rawContent = chatCompletion.choices[0]?.message?.content || "";
+    const rawContent = result.content;
 
     // Safely parse the JSON response
     let analysis;

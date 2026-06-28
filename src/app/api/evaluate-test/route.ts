@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
-import Groq from "groq-sdk";
-import nodemailer from "nodemailer";
 import { getSelectionEmail, getRejectionEmail } from "@/lib/email-templates";
 import { registerIntern, generateInternID } from "@/lib/registry";
-
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
+import { runCascadeFlow } from "@/lib/cascadeflow";
+import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -26,7 +22,7 @@ export async function POST(req: Request) {
 
     // 1. Prepare AI Evaluation Prompt
     const totalQuestions = questions.length;
-    const systemPrompt = `You are KevRyn's Technical Verifier. 
+    const systemPrompt = `You are KarsaTek OS's Technical Verifier. 
 Analyze the candidate's test results for the role: ${role}.
 Performance Data:
 - Questions Answered: ${Object.keys(answers).length} / ${totalQuestions}
@@ -36,33 +32,40 @@ Evaluate the technical aptitude.
 If strikes > 3, the candidate is usually REJECTED for integrity.
 If score > 70%, they are ADMITTED.
 
-Return ONLY a RAW JSON object:
+Return ONLY a RAW JSON object matching this schema:
 {
   "score": number (0-100),
   "verdict": "ADMITTED" | "REJECTED",
   "technical_depth": "EXTREME" | "MODERATE" | "LOW",
-  "summary": "Brief 1-sentence technical feedback"
+  "summary": "Brief 1-sentence technical feedback",
+  "candidateIntelligence": {
+    "technicalAbility": { "score": number, "explanation": "string", "confidence": number },
+    "communication": { "score": number, "explanation": "string", "confidence": number },
+    "learningSpeed": { "score": number, "explanation": "string", "confidence": number },
+    "adaptability": { "score": number, "explanation": "string", "confidence": number },
+    "leadership": { "score": number, "explanation": "string", "confidence": number },
+    "problemSolving": { "score": number, "explanation": "string", "confidence": number },
+    "cultureFit": { "score": number, "explanation": "string", "confidence": number },
+    "riskLevel": { "score": number, "explanation": "string", "confidence": number }
+  }
 }`;
 
     const userPrompt = `Candidate: ${name}
 Answers Map: ${JSON.stringify(answers)}`;
 
-    const chatCompletion = await groq.chat.completions.create({
+    const flowResult = await runCascadeFlow({
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
-      model: "llama-3.3-70b-versatile",
-      temperature: 0.2,
+      priority: "HEAVY",
       response_format: { type: "json_object" }
     });
 
-    const result = JSON.parse(chatCompletion.choices[0].message.content || "{}");
+    const result = JSON.parse(flowResult.content || "{}");
 
     // 2. Sovereign Onboarding Sequence & Identity Generation
     let internId = null;
-    let tempPwd = undefined;
-    let clerkUserId = null;
 
     if (result.verdict === "ADMITTED") {
       const newId = generateInternID(name, role);
@@ -76,7 +79,7 @@ Answers Map: ${JSON.stringify(answers)}`;
       });
       internId = registeredData.id;
 
-      // 2A. NATIVE MONGODB INITIAL SYNCHRONIZATION (Guaranteed)
+      // NATIVE MONGODB INITIAL SYNCHRONIZATION (Guaranteed)
       try {
         const { getDb } = await import("@/lib/db");
         const db = await getDb();
@@ -93,83 +96,68 @@ Answers Map: ${JSON.stringify(answers)}`;
               score: result.score || 0,
               totalPoints: 0,
               joinedAt: new Date(),
-              status: "ACTIVE"
+              status: "TEST_COMPLETED",
+              candidateIntelligence: result.candidateIntelligence || {},
+              testResult: {
+                score: result.score,
+                technical_depth: result.technical_depth,
+                summary: result.summary,
+                strikes,
+                answers
+              }
             }
           },
           { upsert: true }
         );
-        console.log("[AUTOMATION SUCCESS] Initial MongoDB Sync Complete.");
+        console.log("[AUTOMATION SUCCESS] Initial MongoDB Sync Complete. Promoted to Interview Round.");
       } catch(dbErr) {
         console.error("[CRITICAL] Initial MongoDB Synchronization failed:", dbErr);
       }
-
-      // Generate a secure temporary password
-      tempPwd = "KR-" + Math.random().toString(36).substring(2, 10).toUpperCase() + "!";
-
-      // 2B. CLERK IDENTITY PROVISIONING
+    } else {
+      // REJECTED
+      const newId = generateInternID(name, role);
+      internId = newId;
       try {
-        const clerkRes = await fetch("https://api.clerk.com/v1/users", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${process.env.CLERK_SECRET_KEY}`,
-            "Content-Type": "application/json"
+        const { getDb } = await import("@/lib/db");
+        const db = await getDb();
+        await db.collection("interns").updateOne(
+          { _id: internId! as any },
+          {
+            $set: {
+              internId: internId,
+              name,
+              email,
+              role: role.replace('-', ' ').toUpperCase(),
+              domain: role,
+              score: result.score || 0,
+              totalPoints: 0,
+              joinedAt: new Date(),
+              status: "REJECTED",
+              candidateIntelligence: result.candidateIntelligence || {},
+              testResult: {
+                score: result.score,
+                technical_depth: result.technical_depth,
+                summary: result.summary,
+                strikes,
+                answers
+              }
+            }
           },
-          body: JSON.stringify({
-            email_address: [email],
-            password: tempPwd,
-            first_name: name.split(' ')[0],
-            last_name: name.split(' ').slice(1).join(' '),
-            public_metadata: { clearance: 3, role: "intern", internId }
-          })
+          { upsert: true }
+        );
+
+        // Send rejection email immediately
+        const emailHtml = getRejectionEmail(name, role);
+        await transporter.sendMail({
+          from: `"KarsaTek OS Protocol" <${process.env.EMAIL_USER}>`,
+          to: email, 
+          subject: `[PROTOCOL] Application Update: ${role}`,
+          html: emailHtml,
         });
-
-        if (clerkRes.ok) {
-          const clerkData = await clerkRes.json();
-          clerkUserId = clerkData.id;
-          console.log("[AUTOMATION SUCCESS] Clerk Identity Generated:", clerkUserId);
-          
-          // Update MongoDB with Clerk ID
-          try {
-            const { getDb } = await import("@/lib/db");
-            const db = await getDb();
-            await db.collection("interns").updateOne(
-              { _id: internId! as any },
-              { $set: { clerkId: clerkUserId } }
-            );
-            console.log("[AUTOMATION SUCCESS] Clerk ID linked in MongoDB.");
-          } catch (dbLinkErr) {
-            console.error("[WARNING] Could not link Clerk ID in MongoDB:", dbLinkErr);
-          }
-        } else {
-          console.error("[CLERK PROVISION ERROR]", await clerkRes.text());
-        }
-      } catch (authErr) {
-        console.error("[IDENTITY FAILURE] Could not reach Clerk API:", authErr);
+        console.log(`[REJECTION] Dispatched rejection email to ${email}`);
+      } catch (err) {
+        console.error("[REJECT_SYNC_ERROR]", err);
       }
-    }
-
-    // 3. Automated Onboarding Email (Resend)
-    try {
-      const host = req.headers.get("origin") || "https://kevryn.ai";
-      const offerUrl = internId ? `${host}/offer?id=${internId}` : host;
-      const workspaceUrl = `${host}/workspace`;
-
-      const emailHtml = (result.verdict === "ADMITTED" && internId)
-        ? getSelectionEmail(name, role, workspaceUrl, offerUrl, internId, tempPwd)
-        : getRejectionEmail(name, role);
-
-      await transporter.sendMail({
-        from: `"KevRyn Protocol" <${process.env.EMAIL_USER}>`,
-        to: email, 
-        subject: result.verdict === "ADMITTED" 
-          ? `[PROTOCOL] Selection Confirmation: ${role}` 
-          : `[PROTOCOL] Application Update: ${role}`,
-        html: emailHtml,
-      });
-
-      console.log(`[ONBOARDING] Official Protocol dispatched to ${email} | Verdict: ${result.verdict}`);
-    } catch (emailErr) {
-      console.error("[ONBOARDING ERROR] Protocol Dispatch Failed:", emailErr);
     }
 
     return NextResponse.json({ ...result, internId });

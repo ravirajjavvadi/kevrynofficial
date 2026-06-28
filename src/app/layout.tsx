@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "KevRyn Official Platform | AI Company Infrastructure",
+  title: "KarsaTek OS Official Platform | AI Company Infrastructure",
   description: "A futuristic AI-powered company ecosystem, automating hiring, applicant tracking, testing, and intelligent HR workflows.",
 };
 

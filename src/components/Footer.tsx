@@ -19,7 +19,7 @@ export function Footer() {
                 <Hexagon className="w-10 h-10 text-brand glow-text" />
               </div>
               <div className="flex flex-col">
-                <span className="text-3xl font-black tracking-tighter text-foreground">KEVRYN</span>
+                <span className="text-3xl font-black tracking-tighter text-foreground">KarsaTek OS</span>
                 <span className="text-[10px] font-bold tracking-[0.4em] text-muted-foreground uppercase -mt-1 ml-0.5">NEXT GEN AI IDE</span>
               </div>
             </Link>
@@ -78,7 +78,7 @@ export function Footer() {
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted">Multi-Node Active System</span>
           </div>
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground">
-            &copy; {new Date().getFullYear()} KevRyn Official Ecosystem. Powered by K-Intelligence.
+            &copy; {new Date().getFullYear()} KarsaTek OS Official Ecosystem. Powered by K-Intelligence.
           </p>
         </div>
       </div>

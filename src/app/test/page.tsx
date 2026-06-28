@@ -25,6 +25,7 @@ function TestContent() {
    const [candidateName, setCandidateName] = useState('Unknown Candidate')
    const [candidateEmail, setCandidateEmail] = useState('')
    const [candidateRole, setCandidateRole] = useState('unspecified')
+   const [isFullscreen, setIsFullscreen] = useState(false)
 
    // Initialize Identity & Test Context
    useEffect(() => {
@@ -52,7 +53,7 @@ function TestContent() {
      setQuestions(set)
    }, [searchParams])
 
-  // Anti-Cheat Protocol
+  // Anti-Cheat & Fullscreen Protocol
   useEffect(() => {
     const handleContextMenu = (e: MouseEvent) => e.preventDefault()
     document.addEventListener("contextmenu", handleContextMenu)
@@ -64,11 +65,21 @@ function TestContent() {
     }
     document.addEventListener("visibilitychange", handleVisibilityChange)
 
+    const handleFullscreenChange = () => {
+      const isCurrentlyFullscreen = !!document.fullscreenElement
+      setIsFullscreen(isCurrentlyFullscreen)
+      if (!isCurrentlyFullscreen && !isFinished && questions.length > 0) {
+        setStrikes(prev => prev + 1)
+      }
+    }
+    document.addEventListener("fullscreenchange", handleFullscreenChange)
+
     return () => {
       document.removeEventListener("contextmenu", handleContextMenu)
       document.removeEventListener("visibilitychange", handleVisibilityChange)
+      document.removeEventListener("fullscreenchange", handleFullscreenChange)
     }
-  }, [])
+  }, [questions, isFinished])
 
   // Timer Effect
   useEffect(() => {
@@ -161,10 +172,10 @@ function TestContent() {
              </div>
              {testResult?.verdict === 'ADMITTED' && (
                 <button 
-                  onClick={() => router.push(`/offer?id=${testResult?.internId}`)}
+                  onClick={() => router.push(`/interview?name=${encodeURIComponent(candidateName)}&email=${encodeURIComponent(candidateEmail)}&role=${encodeURIComponent(candidateRole)}&id=${testResult?.internId}`)}
                   className="w-full py-6 rounded-2xl bg-brand text-black font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-[0_0_30px_var(--color-brand-glow)]"
                 >
-                  Download Offer Protocol
+                  Initiate Adaptive AI Interview
                 </button>
              )}
           </div>
@@ -174,6 +185,34 @@ function TestContent() {
   }
 
   const currentQ = questions[currentIndex]
+
+  if (!isFullscreen) {
+    return (
+      <div className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center p-8 text-center space-y-8 select-none">
+        <div className="absolute inset-0 bg-radial-gradient from-brand/5 to-black pointer-events-none" />
+        <div className="inline-flex p-6 rounded-full bg-brand/10 border border-brand/20 mb-2 shadow-[0_0_30px_var(--color-brand-glow)]">
+          <Lock className="w-16 h-16 text-brand" />
+        </div>
+        <div className="space-y-3 max-w-md">
+          <h2 className="text-3xl font-black text-white uppercase tracking-tighter">SECURE PROCTORING REQUIRED</h2>
+          <p className="text-sm font-semibold text-white/60 leading-relaxed uppercase tracking-tighter">
+            This assessment requires a strict full-screen environment. Any attempt to exit full-screen will log a security breach strike on your dossier.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            document.documentElement.requestFullscreen().catch(err => {
+              console.error(err);
+            });
+          }}
+          className="px-8 py-5 rounded-2xl bg-brand text-black font-black uppercase tracking-widest text-xs hover:scale-105 active:scale-95 transition-all cursor-pointer shadow-[0_0_30px_var(--color-brand-glow)] border-none"
+        >
+          Enter Secure Arena
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden flex flex-col">

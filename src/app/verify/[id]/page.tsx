@@ -59,7 +59,7 @@ export default function VerificationPage() {
           <AlertTriangle className="w-16 h-16 text-red-500 mx-auto" />
           <h1 className="text-3xl font-black text-foreground uppercase tracking-tighter">Registry Conflict</h1>
           <p className="text-sm text-muted-foreground font-medium uppercase tracking-widest leading-relaxed">
-            The provided ID [ {id} ] does not exist in the KevRyn Sovereign Registry.
+            The provided ID [ {id} ] does not exist in the KarsaTek OS Sovereign Registry.
           </p>
           <button 
             onClick={() => window.location.href = "/"}
@@ -123,7 +123,7 @@ export default function VerificationPage() {
               <div className="space-y-4 p-8 rounded-3xl bg-white/[0.02] border border-white/5">
                  <div className="flex items-center gap-3 text-accent">
                     <Terminal className="w-4 h-4" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">KevRyn AI Score</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest">KarsaTek OS AI Score</span>
                  </div>
                  <p className="text-4xl font-black tracking-tighter text-accent">{data.score}%</p>
               </div>
@@ -155,7 +155,7 @@ export default function VerificationPage() {
         </div>
 
         <p className="text-center text-[10px] font-bold text-muted-foreground uppercase tracking-[0.5em] opacity-40">
-           Protected by KevRyn Sovereign Encryption &bull; 2026
+           Protected by KarsaTek OS Sovereign Encryption &bull; 2026
         </p>
       </motion.div>
     </div>

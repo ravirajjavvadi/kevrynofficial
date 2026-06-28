@@ -9,6 +9,43 @@ import {
 } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 
+
+const loadPdfJs = (): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    if (typeof window === "undefined") {
+      reject(new Error("Window context unavailable"));
+      return;
+    }
+    if ((window as any).pdfjsLib) {
+      resolve((window as any).pdfjsLib);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js";
+    script.onload = () => {
+      const pdfjsLib = (window as any).pdfjsLib;
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
+      resolve(pdfjsLib);
+    };
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+};
+
+const extractTextFromPdfClient = async (file: File): Promise<string> => {
+  const pdfjsLib = await loadPdfJs();
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let text = "";
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const strings = content.items.map((item: any) => item.str);
+    text += strings.join(" ") + "\n";
+  }
+  return text;
+};
+
 interface AnalysisResult {
   mastery_index: number;
   verdict: "APPROVED" | "HOLD" | "DECLINED";
@@ -96,9 +133,19 @@ function ApplyForm() {
     }, 2000)
 
     try {
+      let clientExtractedText = "";
+      try {
+        clientExtractedText = await extractTextFromPdfClient(file);
+      } catch (clientErr) {
+        console.warn("Client-side PDF text extraction failed:", clientErr);
+      }
+
       const fd = new FormData()
       fd.append("file", file)
       fd.append("role", role)
+      if (clientExtractedText) {
+        fd.append("extractedText", clientExtractedText)
+      }
 
       const response = await fetch("/api/analyze", {
         method: "POST",
@@ -199,7 +246,7 @@ function ApplyForm() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-2">Direct Email</label>
-                    <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full bg-background/50 border-2 border-border rounded-2xl px-6 py-4 text-foreground placeholder-muted/60 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all font-bold" placeholder="protocol@kevryn.ai" />
+                    <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full bg-background/50 border-2 border-border rounded-2xl px-6 py-4 text-foreground placeholder-muted/60 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all font-bold" placeholder="protocol@karsatek.os" />
                   </div>
                   <div className="space-y-2 md:col-span-2">
                     <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-2">Connection Node (Phone)</label>

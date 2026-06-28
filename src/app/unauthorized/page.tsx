@@ -66,7 +66,7 @@ export default function UnauthorizedPage() {
 
       {/* Floating Info */}
       <div className="mt-12 text-center relative z-10">
-        <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.2em]">KevRyn Sovereign AI Kernel v1.0</p>
+        <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.2em]">KarsaTek OS Sovereign AI Kernel v1.0</p>
       </div>
     </div>
   );

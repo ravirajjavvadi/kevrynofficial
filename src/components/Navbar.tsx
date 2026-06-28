@@ -27,7 +27,7 @@ export function Navbar() {
           
           <div className="flex flex-col">
             <span className="text-2xl font-black tracking-tighter text-foreground group-hover:text-brand transition-colors">
-              KEVRYN
+              KarsaTek OS
             </span>
             <span className="text-[10px] font-bold tracking-[0.3em] text-muted-foreground/60 uppercase -mt-1 ml-0.5">
               Revolution AI

@@ -11,7 +11,7 @@ export interface InternData {
 
 // In a real app, this would be a database call.
 // For the demo, we will use a localStorage-backed registry.
-const REGISTRY_KEY = "kevryn_intern_registry";
+const REGISTRY_KEY = "KarsaTek OS_intern_registry";
 
 export function generateInternID(name: string, domain: string): string {
   const year = new Date().getFullYear();

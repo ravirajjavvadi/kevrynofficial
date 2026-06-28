@@ -73,7 +73,7 @@ export default function Home() {
               className="group flex items-center gap-3 px-6 py-2 rounded-full border border-brand/30 bg-brand/5 backdrop-blur-xl mb-10 cursor-pointer hover:border-brand/60 transition-all shadow-[0_0_20px_var(--color-brand-glow)]"
             >
               <div className="w-2 h-2 rounded-full bg-brand animate-ping" />
-              <span className="text-[10px] font-black tracking-[0.4em] text-brand uppercase">The Next Gen AI IDE</span>
+              <span className="text-[10px] font-black tracking-[0.4em] text-brand uppercase">The Autonomous AI Hire OS</span>
               <ChevronRight className="w-3 h-3 text-brand group-hover:translate-x-1 transition-transform" />
             </motion.div>
             
@@ -83,10 +83,10 @@ export default function Home() {
               className="text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter leading-[0.85] mb-12"
             >
               <span className="text-transparent bg-clip-text bg-gradient-to-b from-foreground via-foreground/90 to-muted-foreground/20">
-                Code. Deploy.<br />
+                Assess. Interview.<br />
               </span>
               <span className="text-brand glow-text drop-shadow-[0_0_30px_rgba(0,210,255,0.4)]">
-                Revolutionize.
+                Hire.
               </span>
             </motion.h1>
             
@@ -94,7 +94,7 @@ export default function Home() {
               variants={FADE_UP_ANIMATION_VARIANTS}
               className="text-xl md:text-2xl text-muted-foreground max-w-3xl mb-14 leading-relaxed font-medium tracking-tight"
             >
-              KevRyn is an autonomous AI production ecosystem. We are eliminating the barrier between ideation and deployment. Build the future, scale the impossible.
+              KarsaTek OS is an autonomous cognitive recruitment engine. We are eliminating the barrier between assessment and selection. Hire the future, scale your team.
             </motion.p>
             
             <motion.div variants={FADE_UP_ANIMATION_VARIANTS} className="flex flex-col sm:flex-row items-center gap-6 min-h-[80px]">
@@ -145,7 +145,7 @@ export default function Home() {
               className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-12 border-t border-border/50 pt-16 w-full max-w-5xl"
             >
               {[
-                { label: "Deployment Velocity", value: "0.4s" },
+                { label: "Cognitive Evaluation", value: "0.4s" },
                 { label: "AI Neural Capacity", value: "Infinite" },
                 { label: "Active Nodes", value: "842,912" },
                 { label: "Uptime Protocol", value: "99.99%" },

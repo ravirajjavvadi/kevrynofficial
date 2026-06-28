@@ -1,6 +1,6 @@
 /**
  * Sovereign Email Protocol
- * Designed for KevRyn Technologies
+ * Designed for KarsaTek OS Technologies
  */
 
 export const getSelectionEmail = (name: string, role: string, workspaceUrl: string, offerUrl: string, id: string, internPwd?: string) => `
@@ -31,10 +31,10 @@ export const getSelectionEmail = (name: string, role: string, workspaceUrl: stri
     <div class="container">
         <div class="header">
             <div class="logo">KR</div>
-            <div style="font-size: 12px; font-weight: 900; letter-spacing: 2px; color: #000;">KEVRYN TECHNOLOGIES</div>
+            <div style="font-size: 12px; font-weight: 900; letter-spacing: 2px; color: #000;">KarsaTek OS TECHNOLOGIES</div>
         </div>
         <div class="content">
-            <h1>Internship Selection Confirmation</h1>
+            <h1>Official Selection Confirmation</h1>
             <p>Greetings <strong>${name}</strong>,</p>
             <p>Following your exceptional performance in our Qualifier Arena, we are pleased to officially extend an offer for the following role:</p>
             <div class="role-badge">${role}</div>
@@ -59,12 +59,12 @@ export const getSelectionEmail = (name: string, role: string, workspaceUrl: stri
             </div>
 
             <a href="${offerUrl}" class="cta-button">View Official Offer Letter</a>
-            <a href="${workspaceUrl}" class="secondary-button">Access Intern Workspace</a>
+            <a href="${workspaceUrl}" class="secondary-button">Access Team Workspace</a>
             
             <p style="margin-top: 30px; font-size: 12px;">Welcome to the ecosystem where AI innovation meets absolute sovereign engineering. We look forward to your contributions.</p>
         </div>
         <div class="footer">
-            <div class="footer-text">Official Protocol • KevRyn Revolution</div>
+            <div class="footer-text">Official Protocol • KarsaTek OS Revolution</div>
         </div>
     </div>
 </body>
@@ -92,18 +92,18 @@ export const getRejectionEmail = (name: string, role: string) => `
     <div class="container">
         <div class="header">
             <div class="logo">KR</div>
-            <div style="font-size: 10px; font-weight: 900; letter-spacing: 2px; color: rgba(255,255,255,0.4);">KEVRYN TECHNOLOGIES</div>
+            <div style="font-size: 10px; font-weight: 900; letter-spacing: 2px; color: rgba(255,255,255,0.4);">KarsaTek OS TECHNOLOGIES</div>
         </div>
         <div class="content">
             <h1>Application Status Update</h1>
             <p>Greetings <strong>${name}</strong>,</p>
-            <p>Thank you for participating in the KevRyn Qualifier Arena for the <strong>${role}</strong> position.</p>
+            <p>Thank you for participating in the KarsaTek OS Qualifier Arena for the <strong>${role}</strong> position.</p>
             <p>Our team has carefully evaluated your performance and cognitive alignment. At this time, we will not be moving forward with your application. The competition in the current cycle is exceptionally high, and we have reached our capacity for the current onboarding protocol.</p>
             <p>We appreciate the time and intelligence you invested in our assessment system. Your credentials will remain in our talent registry for potential future cycles.</p>
             <p>We wish you absolute success in your continued engineering journey.</p>
         </div>
         <div class="footer">
-            <div class="footer-text">Official Protocol • KevRyn Revolution</div>
+            <div class="footer-text">Official Protocol • KarsaTek OS Revolution</div>
         </div>
     </div>
 </body>

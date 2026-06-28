@@ -63,17 +63,17 @@ function OfferContent() {
                <span className="text-2xl font-black text-black">KR</span>
             </div>
             <div className="space-y-0.5">
-               <h1 className="text-xl font-black tracking-tighter uppercase whitespace-nowrap">KevRyn Technologies</h1>
+               <h1 className="text-xl font-black tracking-tighter uppercase whitespace-nowrap">KarsaTek OS Technologies</h1>
                <p className="text-[8px] font-bold text-brand uppercase tracking-[0.3em]">AI-Powered Innovation Ecosystem</p>
             </div>
          </div>
          
          <div className="flex flex-col md:items-end gap-1.5 text-right">
             <div className="flex items-center gap-2 text-muted-foreground">
-               <Globe className="w-2.5 h-2.5" /> <span className="text-[8px] font-bold uppercase tracking-widest leading-none text-white/40">kevryn.ai</span>
+               <Globe className="w-2.5 h-2.5" /> <span className="text-[8px] font-bold uppercase tracking-widest leading-none text-white/40">karsatek.os</span>
             </div>
             <div className="flex items-center gap-2 text-muted-foreground">
-               <Mail className="w-2.5 h-2.5" /> <span className="text-[8px] font-bold uppercase tracking-widest leading-none text-white/40">protocol@kevryn.ai</span>
+               <Mail className="w-2.5 h-2.5" /> <span className="text-[8px] font-bold uppercase tracking-widest leading-none text-white/40">protocol@karsatek.os</span>
             </div>
             <div className="mt-1 px-3 py-1 rounded-full bg-white/5 border border-white/10 no-print">
                <span className="text-[8px] font-black tracking-widest uppercase opacity-40">ID: {data.id?.toString().slice(-8) || "UNKNOWN"}</span>
@@ -122,7 +122,7 @@ function OfferContent() {
 
                      <div className="p-5 rounded-xl bg-brand/5 border border-brand/20">
                         <p className="text-[10px] font-medium leading-relaxed italic text-white/70">
-                           "We are pleased to offer you the position of {data.role || 'Intern'} at KevRyn Technologies. Your performance in the Qualifier Arena has demonstrated exceptional cognitive alignment with our core objectives."
+                           "We are pleased to offer you the position of {data.role || 'Intern'} at KarsaTek OS Technologies. Your performance in the Qualifier Arena has demonstrated exceptional cognitive alignment with our core objectives."
                         </p>
                      </div>
                   </div>
@@ -212,13 +212,13 @@ function OfferContent() {
                       </div>
                     </div>
                     
-                    {/* KevRyn Branding Piece */}
+                    {/* KarsaTek OS Branding Piece */}
                     <div className="pt-4 mt-2 border-t border-white/5 flex flex-col items-center gap-2">
                        <div className="w-8 h-8 bg-gradient-to-br from-brand to-accent rounded-lg flex items-center justify-center">
                           <span className="text-sm font-black text-black">KR</span>
                        </div>
                        <div className="text-center">
-                          <h5 className="text-[9px] font-black tracking-tighter uppercase text-white/80">KevRyn Technologies</h5>
+                          <h5 className="text-[9px] font-black tracking-tighter uppercase text-white/80">KarsaTek OS Technologies</h5>
                           <p className="text-[6px] font-bold text-brand uppercase tracking-[0.2em] leading-none">Intelligence Ecosystem</p>
                        </div>
                     </div>
@@ -355,7 +355,7 @@ function OfferContent() {
 
          <div className="hidden print:block print-footer">
             <p className="uppercase tracking-[0.4em] font-black italic text-brand">
-               Sovereign Document • KevRyn Revolution AI • Authenticity Guaranteed
+               Sovereign Document • KarsaTek OS Revolution AI • Authenticity Guaranteed
             </p>
          </div>
       </main>

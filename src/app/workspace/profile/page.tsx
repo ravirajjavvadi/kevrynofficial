@@ -51,7 +51,7 @@ export default function ProfilePage() {
         <div className="flex-1 space-y-6 text-center md:text-left">
           <div>
             <h2 className="text-3xl font-black text-white uppercase tracking-tighter">{user?.fullName || "Sovereign Intern"}</h2>
-            <div className="text-sm font-medium text-white/40">{user?.primaryEmailAddress?.emailAddress || "ident@kevryn.com"}</div>
+            <div className="text-sm font-medium text-white/40">{user?.primaryEmailAddress?.emailAddress || "ident@KarsaTek OS.com"}</div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
