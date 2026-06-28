@@ -10,17 +10,20 @@ export async function GET() {
       return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
     }
 
-    const email = user.emailAddresses[0]?.emailAddress;
-
-    if (!email) {
-      return NextResponse.json({ error: "NO_EMAIL_FOUND" }, { status: 400 });
-    }
+    const emails = user.emailAddresses.map(e => e.emailAddress.toLowerCase());
 
     const db = await getDb();
-    const intern = await db.collection("interns").findOne({ email: email });
+    
+    // Search by any of the user's emails
+    const intern = await db.collection("interns").findOne({ 
+      $or: [
+        { email: { $in: emails } },
+        { internId: { $in: emails } } // Support if internId was somehow set to email
+      ]
+    });
 
     if (!intern) {
-      return NextResponse.json({ error: "NOT_REGISTERED" }, { status: 404 });
+      return NextResponse.json({ error: "NOT_REGISTERED", emailsChecked: emails }, { status: 404 });
     }
 
     // Map _id to id for consistency
