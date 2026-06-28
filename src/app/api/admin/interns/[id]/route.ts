@@ -10,7 +10,7 @@ const ADMIN_WHITELIST = [
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await currentUser();
@@ -50,7 +50,7 @@ export async function GET(
 // POST to update intern data or assign tasks
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await currentUser();
