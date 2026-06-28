@@ -14,10 +14,14 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const user = await currentUser();
-  const email = user?.emailAddresses[0]?.emailAddress || "";
+  if (!user) {
+    redirect("/");
+  }
 
-  // 1. Server-Side Admin Guard
-  if (!user || !ADMIN_WHITELIST.includes(email.toLowerCase())) {
+  const emails = user.emailAddresses.map(e => e.emailAddress.toLowerCase());
+  const isAdmin = emails.some(email => ADMIN_WHITELIST.includes(email));
+
+  if (!isAdmin) {
     redirect("/");
   }
 

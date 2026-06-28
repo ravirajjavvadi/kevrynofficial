@@ -21,23 +21,53 @@ import {
 import { useUser } from "@clerk/nextjs";
 import { getInternDataByEmail } from "@/lib/registry";
 
-const StatCard = ({ icon: Icon, label, value, color }: { icon: any; label: string; value: string; color: string }) => (
-  <motion.div 
-    whileHover={{ y: -5 }}
-    className="p-8 rounded-[2.5rem] bg-white/[0.03] border border-white/10 relative overflow-hidden group"
-  >
-    <div className={`absolute top-0 right-0 w-32 h-32 bg-${color}/10 blur-[80px] group-hover:bg-${color}/20 transition-all`} />
-    <div className="relative z-10 flex flex-col gap-6">
-      <div className={`w-12 h-12 rounded-2xl bg-${color}/10 border border-${color}/20 flex items-center justify-center text-${color}`}>
-        <Icon className="w-6 h-6" />
+const colorMap: Record<string, { bg: string, bgHover: string, border: string, text: string }> = {
+  "brand": {
+    bg: "bg-brand/10",
+    bgHover: "group-hover:bg-brand/20",
+    border: "border-brand/20",
+    text: "text-brand"
+  },
+  "blue-400": {
+    bg: "bg-blue-400/10",
+    bgHover: "group-hover:bg-blue-400/20",
+    border: "border-blue-400/20",
+    text: "text-blue-400"
+  },
+  "purple-400": {
+    bg: "bg-purple-400/10",
+    bgHover: "group-hover:bg-purple-400/20",
+    border: "border-purple-400/20",
+    text: "text-purple-400"
+  },
+  "emerald-400": {
+    bg: "bg-emerald-400/10",
+    bgHover: "group-hover:bg-emerald-400/20",
+    border: "border-emerald-400/20",
+    text: "text-emerald-400"
+  }
+};
+
+const StatCard = ({ icon: Icon, label, value, color }: { icon: any; label: string; value: string; color: string }) => {
+  const classes = colorMap[color] || { bg: "bg-white/10", bgHover: "group-hover:bg-white/20", border: "border-white/20", text: "text-white" };
+  return (
+    <motion.div 
+      whileHover={{ y: -5 }}
+      className="p-8 rounded-[2.5rem] bg-white/[0.03] border border-white/10 relative overflow-hidden group"
+    >
+      <div className={`absolute top-0 right-0 w-32 h-32 ${classes.bg} blur-[80px] ${classes.bgHover} transition-all`} />
+      <div className="relative z-10 flex flex-col gap-6">
+        <div className={`w-12 h-12 rounded-2xl ${classes.bg} ${classes.border} flex items-center justify-center ${classes.text}`}>
+          <Icon className="w-6 h-6" />
+        </div>
+        <div>
+          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-1">{label}</div>
+          <div className="text-4xl font-black text-white tracking-tighter">{value}</div>
+        </div>
       </div>
-      <div>
-        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-1">{label}</div>
-        <div className="text-4xl font-black text-white tracking-tighter">{value}</div>
-      </div>
-    </div>
-  </motion.div>
-);
+    </motion.div>
+  );
+};
 
 interface InternData {
   id: string;

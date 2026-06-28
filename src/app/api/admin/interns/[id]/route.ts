@@ -14,18 +14,25 @@ export async function GET(
 ) {
   try {
     const user = await currentUser();
-    const email = user?.emailAddresses[0]?.emailAddress;
 
-    if (!user || !email || !ADMIN_WHITELIST.includes(email.toLowerCase())) {
+    if (!user) {
+      return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+    }
+
+    const emails = user.emailAddresses.map(e => e.emailAddress.toLowerCase());
+    const isAdmin = emails.some(email => ADMIN_WHITELIST.includes(email));
+
+    if (!isAdmin) {
       return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
     }
 
     const { id } = await params;
     const db = await getDb();
     
-    // Attempt to find by ObjectId, Email, or Custom internId
+    // Attempt to find by string ID, ObjectId, Email, or Custom internId
     const query: any = {
       $or: [
+        { _id: id },
         { email: id },
         { internId: id }
       ]
@@ -60,9 +67,15 @@ export async function PATCH(
 ) {
   try {
     const user = await currentUser();
-    const email = user?.emailAddresses[0]?.emailAddress;
 
-    if (!user || !email || !ADMIN_WHITELIST.includes(email.toLowerCase())) {
+    if (!user) {
+      return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+    }
+
+    const emails = user.emailAddresses.map(e => e.emailAddress.toLowerCase());
+    const isAdmin = emails.some(email => ADMIN_WHITELIST.includes(email));
+
+    if (!isAdmin) {
       return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
     }
 
@@ -76,6 +89,7 @@ export async function PATCH(
 
     const query: any = {
       $or: [
+        { _id: id },
         { email: id },
         { internId: id }
       ]

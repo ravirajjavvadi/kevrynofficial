@@ -2,10 +2,10 @@ const { MongoClient } = require('mongodb');
 require('dotenv').config({ path: '.env.local' });
 
 async function checkInterns() {
-  const client = new MongoClient(process.env.MONGODB_URI);
+  const client = new MongoClient(process.env.DATABASE_URL);
   try {
     await client.connect();
-    const db = client.db('test'); // Replace with your DB name if different
+    const db = client.db(); // Let driver infer DB name from URI
     const interns = await db.collection('interns').find({}).toArray();
     console.log('--- ALL INTERNS ---');
     interns.forEach(i => {

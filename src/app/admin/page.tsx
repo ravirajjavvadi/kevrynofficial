@@ -9,17 +9,38 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-const QuickStat = ({ icon: Icon, label, value, color }: any) => (
-  <div className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 space-y-4">
-    <div className={`w-10 h-10 rounded-xl bg-${color}/10 border border-${color}/20 flex items-center justify-center text-${color}`}>
-      <Icon className="w-5 h-5" />
+const colorMap: Record<string, { bg: string, border: string, text: string }> = {
+  "red-500": {
+    bg: "bg-red-500/10",
+    border: "border-red-500/20",
+    text: "text-red-500"
+  },
+  "blue-400": {
+    bg: "bg-blue-400/10",
+    border: "border-blue-400/20",
+    text: "text-blue-400"
+  },
+  "emerald-400": {
+    bg: "bg-emerald-400/10",
+    border: "border-emerald-400/20",
+    text: "text-emerald-400"
+  }
+};
+
+const QuickStat = ({ icon: Icon, label, value, color }: any) => {
+  const classes = colorMap[color] || { bg: "bg-white/10", border: "border-white/20", text: "text-white" };
+  return (
+    <div className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 space-y-4">
+      <div className={`w-10 h-10 rounded-xl ${classes.bg} ${classes.border} flex items-center justify-center ${classes.text}`}>
+        <Icon className="w-5 h-5" />
+      </div>
+      <div>
+        <div className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-1">{label}</div>
+        <div className="text-2xl font-black text-white tracking-tighter">{value}</div>
+      </div>
     </div>
-    <div>
-      <div className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-1">{label}</div>
-      <div className="text-2xl font-black text-white tracking-tighter">{value}</div>
-    </div>
-  </div>
-);
+  );
+};
 
 export default function AdminOverview() {
   const [stats, setStats] = useState({ total: 0, active: 0, completed: 0 });
@@ -77,20 +98,20 @@ export default function AdminOverview() {
 
           <div className="space-y-6 relative z-10">
             {[
-              { label: 'Cloud Database', value: 98, color: 'emerald-400' },
-              { label: 'Authentication Buffer', value: 100, color: 'emerald-400' },
-              { label: 'Task Distribution', value: 85, color: 'blue-400' },
+              { label: 'Cloud Database', value: 98, color: 'emerald-400', textClass: 'text-emerald-400', bgClass: 'bg-emerald-400' },
+              { label: 'Authentication Buffer', value: 100, color: 'emerald-400', textClass: 'text-emerald-400', bgClass: 'bg-emerald-400' },
+              { label: 'Task Distribution', value: 85, color: 'blue-400', textClass: 'text-blue-400', bgClass: 'bg-blue-400' },
             ].map((system) => (
               <div key={system.label} className="space-y-2">
                 <div className="flex justify-between items-end">
                   <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">{system.label}</span>
-                  <span className={`text-[10px] font-black text-${system.color} uppercase tracking-widest`}>{system.value}%</span>
+                  <span className={`text-[10px] font-black ${system.textClass} uppercase tracking-widest`}>{system.value}%</span>
                 </div>
                 <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                   <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: `${system.value}%` }}
-                    className={`h-full bg-${system.color} shadow-[0_0_10px_rgba(239,68,68,0.2)]`}
+                    className={`h-full ${system.bgClass} shadow-[0_0_10px_rgba(239,68,68,0.2)]`}
                   />
                 </div>
               </div>

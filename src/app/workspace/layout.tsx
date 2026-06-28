@@ -10,21 +10,27 @@ export default async function WorkspaceLayout({
   children: React.ReactNode;
 }) {
   const user = await currentUser();
-  const email = user?.emailAddresses[0]?.emailAddress || "";
 
   if (!user) {
     redirect("/");
   }
 
+  const emails = user.emailAddresses.map(e => e.emailAddress.toLowerCase());
+
   // 1. Identity Verification Guard: Sovereign Lockdown (Strict Mode)
   try {
     const db = await getDb();
     // Only allow access if the intern exists in the official MongoDB registry
-    const intern = await db.collection("interns").findOne({ email: email.toLowerCase() });
+    const intern = await db.collection("interns").findOne({ 
+      $or: [
+        { email: { $in: emails } },
+        { internId: { $in: emails } }
+      ]
+    });
     
     if (!intern) {
       // No registry entry found. Absolute block.
-      console.warn(`[SECURITY] Unauthorized Workspace Access Blocked for ${email}`);
+      console.warn(`[SECURITY] Unauthorized Workspace Access Blocked for emails: ${emails.join(", ")}`);
       redirect("/unauthorized");
     }
   } catch (error) {

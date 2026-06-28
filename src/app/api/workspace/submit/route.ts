@@ -9,7 +9,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
     }
 
-    const email = user.emailAddresses[0]?.emailAddress;
+    const emails = user.emailAddresses.map(e => e.emailAddress.toLowerCase());
     const body = await request.json();
     const { taskId, githubUrl, deployUrl } = body;
 
@@ -21,7 +21,12 @@ export async function POST(request: Request) {
 
     // Update the task status and add submission data in the interns collection
     const result = await db.collection("interns").updateOne(
-      { email: email, "tasks.id": taskId },
+      { 
+        $or: [
+          { email: { $in: emails }, "tasks.id": taskId },
+          { internId: { $in: emails }, "tasks.id": taskId }
+        ]
+      },
       { 
         $set: { 
           "tasks.$.status": "under_review",

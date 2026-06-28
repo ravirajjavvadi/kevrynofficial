@@ -76,10 +76,37 @@ Answers Map: ${JSON.stringify(answers)}`;
       });
       internId = registeredData.id;
 
+      // 2A. NATIVE MONGODB INITIAL SYNCHRONIZATION (Guaranteed)
+      try {
+        const { getDb } = await import("@/lib/db");
+        const db = await getDb();
+        
+        await db.collection("interns").updateOne(
+          { _id: internId! as any },
+          {
+            $set: {
+              internId: internId,
+              name,
+              email,
+              role: role.replace('-', ' ').toUpperCase(),
+              domain: role,
+              score: result.score || 0,
+              totalPoints: 0,
+              joinedAt: new Date(),
+              status: "ACTIVE"
+            }
+          },
+          { upsert: true }
+        );
+        console.log("[AUTOMATION SUCCESS] Initial MongoDB Sync Complete.");
+      } catch(dbErr) {
+        console.error("[CRITICAL] Initial MongoDB Synchronization failed:", dbErr);
+      }
+
       // Generate a secure temporary password
       tempPwd = "KR-" + Math.random().toString(36).substring(2, 10).toUpperCase() + "!";
 
-      // 2A. CLERK IDENTITY PROVISIONING
+      // 2B. CLERK IDENTITY PROVISIONING
       try {
         const clerkRes = await fetch("https://api.clerk.com/v1/users", {
           method: "POST",
@@ -101,33 +128,18 @@ Answers Map: ${JSON.stringify(answers)}`;
           clerkUserId = clerkData.id;
           console.log("[AUTOMATION SUCCESS] Clerk Identity Generated:", clerkUserId);
           
-          // 2B. NATIVE MONGODB SYNCHRONIZATION
+          // Update MongoDB with Clerk ID
           try {
-             const { getDb } = await import("@/lib/db");
-             const db = await getDb();
-             
-             await db.collection("interns").updateOne(
-                { _id: internId! as any },
-                {
-                  $set: {
-                    name,
-                    email,
-                    clerkId: clerkUserId,
-                    role: role.replace('-', ' ').toUpperCase(),
-                    domain: role,
-                    score: result.score || 0,
-                    totalPoints: 0,
-                    joinedAt: new Date(),
-                    status: "ACTIVE"
-                  }
-                },
-                { upsert: true }
-             );
-             console.log("[AUTOMATION SUCCESS] Synchronized with Native MongoDB.");
-          } catch(dbErr) {
-             console.warn("[WARNING] MongoDB Synchronization failed.", dbErr);
+            const { getDb } = await import("@/lib/db");
+            const db = await getDb();
+            await db.collection("interns").updateOne(
+              { _id: internId! as any },
+              { $set: { clerkId: clerkUserId } }
+            );
+            console.log("[AUTOMATION SUCCESS] Clerk ID linked in MongoDB.");
+          } catch (dbLinkErr) {
+            console.error("[WARNING] Could not link Clerk ID in MongoDB:", dbLinkErr);
           }
-
         } else {
           console.error("[CLERK PROVISION ERROR]", await clerkRes.text());
         }
