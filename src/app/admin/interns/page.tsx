@@ -9,23 +9,64 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-const StatWidget = ({ icon: Icon, label, value, trend, color }: any) => (
-  <div className="p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 relative overflow-hidden group">
-    <div className={`absolute top-0 right-0 w-32 h-32 bg-${color}/5 blur-[60px] group-hover:bg-${color}/10 transition-all`} />
-    <div className="relative z-10 space-y-4">
-      <div className={`w-10 h-10 rounded-xl bg-${color}/10 border border-${color}/20 flex items-center justify-center text-${color}`}>
-        <Icon className="w-5 h-5" />
-      </div>
-      <div>
-        <div className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-1">{label}</div>
-        <div className="text-3xl font-black text-white tracking-tighter">{value}</div>
-      </div>
-      <div className="flex items-center gap-2 text-[10px] font-black text-emerald-400 uppercase tracking-widest">
-        <TrendingUp className="w-3 h-3" /> {trend}
+const colorMap: Record<string, { bgGlow: string, bgHoverGlow: string, bgIcon: string, borderIcon: string, textIcon: string }> = {
+  "red-500": {
+    bgGlow: "bg-red-500/5",
+    bgHoverGlow: "group-hover:bg-red-500/10",
+    bgIcon: "bg-red-500/10",
+    borderIcon: "border-red-500/20",
+    textIcon: "text-red-500"
+  },
+  "blue-400": {
+    bgGlow: "bg-blue-400/5",
+    bgHoverGlow: "group-hover:bg-blue-400/10",
+    bgIcon: "bg-blue-400/10",
+    borderIcon: "border-blue-400/20",
+    textIcon: "text-blue-400"
+  },
+  "purple-400": {
+    bgGlow: "bg-purple-400/5",
+    bgHoverGlow: "group-hover:bg-purple-400/10",
+    bgIcon: "bg-purple-400/10",
+    borderIcon: "border-purple-400/20",
+    textIcon: "text-purple-400"
+  },
+  "emerald-400": {
+    bgGlow: "bg-emerald-400/5",
+    bgHoverGlow: "group-hover:bg-emerald-400/10",
+    bgIcon: "bg-emerald-400/10",
+    borderIcon: "border-emerald-400/20",
+    textIcon: "text-emerald-400"
+  }
+};
+
+const StatWidget = ({ icon: Icon, label, value, trend, color }: any) => {
+  const classes = colorMap[color] || {
+    bgGlow: "bg-white/5",
+    bgHoverGlow: "group-hover:bg-white/10",
+    bgIcon: "bg-white/10",
+    borderIcon: "border-white/20",
+    textIcon: "text-white"
+  };
+
+  return (
+    <div className="p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 relative overflow-hidden group">
+      <div className={`absolute top-0 right-0 w-32 h-32 ${classes.bgGlow} blur-[60px] ${classes.bgHoverGlow} transition-all`} />
+      <div className="relative z-10 space-y-4">
+        <div className={`w-10 h-10 rounded-xl ${classes.bgIcon} ${classes.borderIcon} flex items-center justify-center ${classes.textIcon}`}>
+          <Icon className="w-5 h-5" />
+        </div>
+        <div>
+          <div className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-1">{label}</div>
+          <div className="text-3xl font-black text-white tracking-tighter">{value}</div>
+        </div>
+        <div className="flex items-center gap-2 text-[10px] font-black text-emerald-400 uppercase tracking-widest">
+          <TrendingUp className="w-3 h-3" /> {trend}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default function InternRegistryPage() {
   const [interns, setInterns] = useState([]);
@@ -53,12 +94,12 @@ export default function InternRegistryPage() {
       {/* Header */}
       <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
         <div className="space-y-4">
-          <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 w-fit">
-            <Shield className="w-4 h-4 text-red-500" />
-            <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Administrative Supremacy Active</span>
+          <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-brand/10 border border-brand/20 w-fit">
+            <Shield className="w-4 h-4 text-brand" />
+            <span className="text-[10px] font-black text-brand uppercase tracking-widest">Decision Intelligence Active</span>
           </div>
           <h1 className="text-5xl md:text-6xl font-black text-white tracking-tighter uppercase leading-[0.9]">
-            Intern<br /><span className="text-white/30">Registry</span>
+            Hiring<br /><span className="text-white/30">War Room</span>
           </h1>
         </div>
         

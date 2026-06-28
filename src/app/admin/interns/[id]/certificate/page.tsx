@@ -29,7 +29,7 @@ export default function InternshipCertificate() {
 
   if (loading || !intern) return null;
 
-  const qrUrl = `https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=https://kevrynofficial.vercel.app/verify/${intern._id}&chld=L|1`;
+  const qrUrl = `https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=https://___KarsaTek OS_OFF_REPO___icial.vercel.app/verify/${intern._id}&chld=L|1`;
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-8 print:p-0">
@@ -45,7 +45,7 @@ export default function InternshipCertificate() {
           <div className="space-y-4">
              <div className="flex items-center gap-3">
                <div className="w-12 h-12 bg-black flex items-center justify-center text-white font-black text-xl italic">KR</div>
-               <div className="text-sm font-black tracking-[0.3em] uppercase">KevRyn Intelligence</div>
+               <div className="text-sm font-black tracking-[0.3em] uppercase">KarsaTek OS Intelligence</div>
              </div>
              <div className="text-[10px] font-bold text-black/40 uppercase tracking-widest max-w-[200px]">
                Autonomous Systems & AI Orchestration Division
@@ -94,7 +94,7 @@ export default function InternshipCertificate() {
                 <CheckCircle2 className="w-3 h-3" /> Blockchain Verified
               </div>
               <div className="text-[10px] font-bold text-black/40 max-w-[150px] leading-tight">
-                Scan to verify credential authenticity on the KevRyn Global Registry.
+                Scan to verify credential authenticity on the KarsaTek OS Global Registry.
               </div>
             </div>
           </div>
@@ -109,7 +109,7 @@ export default function InternshipCertificate() {
             </div>
             <div className="text-center space-y-2">
               <div className="text-2xl font-serif italic text-black/80 border-b border-black/20 pb-2 px-8">
-                KevRyn Board
+                KarsaTek OS Board
               </div>
               <div className="text-[10px] font-black uppercase tracking-widest">Managing Director</div>
             </div>

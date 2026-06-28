@@ -5,7 +5,7 @@ import { AdminSidebar } from "@/components/admin/AdminSidebar";
 
 const ADMIN_WHITELIST = [
   'ravirajjavvadhi@gmail.com',
-  'kevryntech@gmail.com'
+  '___KarsaTek OS_ADMIN_EMAIL___'
 ];
 
 export default async function AdminLayout({

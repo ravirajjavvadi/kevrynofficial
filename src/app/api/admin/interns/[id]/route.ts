@@ -5,7 +5,7 @@ import { ObjectId } from "mongodb";
 
 const ADMIN_WHITELIST = [
   'ravirajjavvadhi@gmail.com',
-  'kevryntech@gmail.com'
+  '___KarsaTek OS_ADMIN_EMAIL___'
 ];
 
 export async function GET(

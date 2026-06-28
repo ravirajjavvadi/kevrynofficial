@@ -43,15 +43,15 @@ export function AdminSidebar() {
           <ShieldAlert className="w-6 h-6 text-black" />
         </div>
         <div className="hidden lg:block">
-          <div className="text-xs font-black text-red-500 tracking-[0.3em] uppercase leading-none">Sovereign</div>
-          <div className="text-sm font-black text-white uppercase tracking-tighter">Admin Core</div>
+          <div className="text-xs font-black text-red-500 tracking-[0.3em] uppercase leading-none">KarsaTek OS</div>
+          <div className="text-sm font-black text-white uppercase tracking-tighter">HireOS</div>
         </div>
       </div>
 
       <nav className="flex-1 space-y-2">
         <AdminSidebarItem icon={BarChart3} label="Command Station" href="/admin" />
-        <AdminSidebarItem icon={Users} label="Intern Registry" href="/admin/interns" />
-        <AdminSidebarItem icon={Layers} label="Task Orchestrator" href="/admin/tasks" />
+        <AdminSidebarItem icon={Users} label="Hiring War Room" href="/admin/interns" />
+        <AdminSidebarItem icon={Layers} label="Onboarding" href="/admin/tasks" />
         <AdminSidebarItem icon={Bell} label="Audit Logs" href="/admin/logs" />
         <AdminSidebarItem icon={Settings} label="Core Settings" href="/admin/settings" />
       </nav>

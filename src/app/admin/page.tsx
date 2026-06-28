@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { 
-  Users, Target, Trophy, Clock, 
-  Shield, Zap, TrendingUp,
-  Activity, BarChart3, Globe
+  Users, Trophy, Clock, Shield, Zap, 
+  Cpu, DollarSign, Database, BrainCircuit,
+  MessageSquare
 } from "lucide-react";
 import Link from "next/link";
 
@@ -43,34 +43,51 @@ const QuickStat = ({ icon: Icon, label, value, color }: any) => {
 };
 
 export default function AdminOverview() {
-  const [stats, setStats] = useState({ total: 0, active: 0, completed: 0 });
+  const [stats, setStats] = useState({ total: 0, interviewed: 0, admitted: 0 });
+  const [cascadeTotals, setCascadeTotals] = useState({ totalSaved: 0, totalCalls: 0, totalCost: 0 });
+  const [hindsightReviews, setHindsightReviews] = useState<any[]>([]);
 
   useEffect(() => {
-    async function fetchStats() {
+    async function fetchAllData() {
       try {
-        const res = await fetch("/api/admin/interns");
-        if (res.ok) {
-          const data = await res.json();
+        const [internsRes, logsRes, memoryRes] = await Promise.all([
+          fetch("/api/admin/interns"),
+          fetch("/api/admin/logs"),
+          fetch("/api/admin/memory")
+        ]);
+
+        if (internsRes.ok) {
+          const data = await internsRes.json();
           setStats({
             total: data.length,
-            active: data.filter((i: any) => i.status !== 'completed').length,
-            completed: data.filter((i: any) => i.status === 'completed').length
+            interviewed: data.filter((i: any) => i.status === 'INTERVIEWED').length,
+            admitted: data.filter((i: any) => i.status === 'ADMITTED').length
           });
         }
+
+        if (logsRes.ok) {
+          const logData = await logsRes.json();
+          setCascadeTotals(logData.totals || { totalSaved: 0, totalCalls: 0, totalCost: 0 });
+        }
+
+        if (memoryRes.ok) {
+          setHindsightReviews(await memoryRes.json());
+        }
+
       } catch (err) {
         console.error(err);
       }
     }
-    fetchStats();
+    fetchAllData();
   }, []);
 
   return (
     <div className="space-y-12">
       {/* Header */}
       <header className="space-y-4">
-        <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 w-fit">
-          <Shield className="w-4 h-4 text-red-500" />
-          <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Sovereign Admin Core v1.0</span>
+        <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-brand/10 border border-brand/20 w-fit">
+          <Shield className="w-4 h-4 text-brand" />
+          <span className="text-[10px] font-black text-brand uppercase tracking-widest">AI Hiring Command Center v2.0</span>
         </div>
         <h1 className="text-5xl md:text-6xl font-black text-white tracking-tighter uppercase leading-[0.9]">
           Command<br /><span className="text-white/30">Station</span>
@@ -79,62 +96,88 @@ export default function AdminOverview() {
 
       {/* Grid Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <QuickStat icon={Users} label="Registered Nodes" value={stats.total} color="red-500" />
-        <QuickStat icon={Activity} label="Active Syncs" value={stats.active} color="blue-400" />
-        <QuickStat icon={Trophy} label="Certifications" value={stats.completed} color="emerald-400" />
+        <QuickStat icon={Users} label="Talent Pool Nodes" value={stats.total} color="red-500" />
+        <QuickStat icon={BrainCircuit} label="AI Interviews Completed" value={stats.interviewed} color="blue-400" />
+        <QuickStat icon={Trophy} label="Approved Hires" value={stats.admitted} color="emerald-400" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Systems Status */}
-        <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/5 blur-[100px]" />
-          <div className="flex items-center justify-between relative z-10">
-            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-white/40">Network Vitals</h2>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Global Live</span>
+        
+        {/* CascadeFlow Routing Analytics */}
+        <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-8 relative overflow-hidden flex flex-col justify-between">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-brand/5 blur-[100px]" />
+          
+          <div className="space-y-6 relative z-10">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xs font-black uppercase tracking-[0.3em] text-white/40">Model Routing Efficiency</h2>
+              <span className="text-[9px] font-black text-brand uppercase tracking-widest border border-brand/20 px-2 py-0.5 rounded">Cascadeflow</span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-1">
+                <span className="text-[8px] font-bold text-white/40 uppercase tracking-wider">Total Saving</span>
+                <p className="text-lg font-black text-emerald-400">${Number(cascadeTotals.totalSaved).toFixed(5)}</p>
+              </div>
+              <div className="space-y-1">
+                <span className="text-[8px] font-bold text-white/40 uppercase tracking-wider">Total Calls</span>
+                <p className="text-lg font-black text-white">{cascadeTotals.totalCalls || 0}</p>
+              </div>
+              <div className="space-y-1">
+                <span className="text-[8px] font-bold text-white/40 uppercase tracking-wider">Total Cost</span>
+                <p className="text-lg font-black text-white/60">${Number(cascadeTotals.totalCost).toFixed(5)}</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between text-[9px] font-bold text-white/60 uppercase">
+                  <span>Routing Optimization</span>
+                  <span>{cascadeTotals.totalCalls ? "92%" : "0%"}</span>
+                </div>
+                <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-full bg-brand w-[92%]" />
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="space-y-6 relative z-10">
-            {[
-              { label: 'Cloud Database', value: 98, color: 'emerald-400', textClass: 'text-emerald-400', bgClass: 'bg-emerald-400' },
-              { label: 'Authentication Buffer', value: 100, color: 'emerald-400', textClass: 'text-emerald-400', bgClass: 'bg-emerald-400' },
-              { label: 'Task Distribution', value: 85, color: 'blue-400', textClass: 'text-blue-400', bgClass: 'bg-blue-400' },
-            ].map((system) => (
-              <div key={system.label} className="space-y-2">
-                <div className="flex justify-between items-end">
-                  <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">{system.label}</span>
-                  <span className={`text-[10px] font-black ${system.textClass} uppercase tracking-widest`}>{system.value}%</span>
-                </div>
-                <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                  <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: `${system.value}%` }}
-                    className={`h-full ${system.bgClass} shadow-[0_0_10px_rgba(239,68,68,0.2)]`}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+          <Link href="/admin/logs" className="block text-center py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white transition-all">
+             Open Cost Audit Log Console
+          </Link>
         </div>
 
-        {/* Quick Actions */}
-        <div className="p-8 rounded-[2.5rem] bg-red-500/5 border border-red-500/10 space-y-8">
-          <h2 className="text-xs font-black uppercase tracking-[0.3em] text-red-500/60">Quick Protocols</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Link href="/admin/interns" className="p-6 rounded-3xl bg-black/40 border border-white/5 hover:border-red-500/20 group transition-all">
-              <BarChart3 className="w-6 h-6 text-white/40 group-hover:text-red-500 mb-4 transition-colors" />
-              <div className="text-xs font-black text-white uppercase tracking-widest">Entry Registry</div>
-              <div className="text-[10px] font-bold text-white/40 uppercase tracking-tighter mt-1">Manage Talent Nodes</div>
-            </Link>
-            <Link href="/admin/tasks" className="p-6 rounded-3xl bg-black/40 border border-white/5 hover:border-red-500/20 group transition-all">
-              <Globe className="w-6 h-6 text-white/40 group-hover:text-red-500 mb-4 transition-colors" />
-              <div className="text-xs font-black text-white uppercase tracking-widest">Orchestrator</div>
-              <div className="text-[10px] font-bold text-white/40 uppercase tracking-tighter mt-1">Deploy New Tasks</div>
-            </Link>
+        {/* Hindsight Organizational Memory */}
+        <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-8 relative overflow-hidden flex flex-col justify-between">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 blur-[100px]" />
+          
+          <div className="space-y-6 relative z-10">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xs font-black uppercase tracking-[0.3em] text-white/40">Hindsight Learning Engine</h2>
+              <span className="text-[9px] font-black text-purple-400 uppercase tracking-widest border border-purple-500/20 px-2 py-0.5 rounded">Persistent Memory</span>
+            </div>
+
+            <div className="space-y-4 max-h-[160px] overflow-y-auto pr-2 scrollbar-thin">
+              {hindsightReviews.length === 0 ? (
+                <div className="text-center py-8 text-xs text-white/20 font-bold uppercase">No feedback loops recorded yet.</div>
+              ) : (
+                hindsightReviews.slice(0, 3).map((r, i) => (
+                  <div key={i} className="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] font-black text-white uppercase">{r.name} ({r.role})</span>
+                      <span className="text-[9px] font-black text-brand uppercase tracking-widest">{r.stage} Review</span>
+                    </div>
+                    <p className="text-[10px] text-white/50 leading-relaxed font-semibold uppercase italic">"{r.feedback}"</p>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
+
+          <Link href="/admin/interns" className="block text-center py-4 bg-brand text-black hover:scale-[1.02] active:scale-95 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">
+             Evaluate Candidates in War Room
+          </Link>
         </div>
+
       </div>
     </div>
   );

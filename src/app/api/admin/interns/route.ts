@@ -4,7 +4,7 @@ import { currentUser } from "@clerk/nextjs/server";
 
 const ADMIN_WHITELIST = [
   'ravirajjavvadhi@gmail.com',
-  'kevryntech@gmail.com'
+  '___KarsaTek OS_ADMIN_EMAIL___'
 ];
 
 export async function GET() {

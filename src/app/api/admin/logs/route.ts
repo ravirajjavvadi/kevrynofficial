@@ -10,7 +10,6 @@ const ADMIN_WHITELIST = [
 export async function GET() {
   try {
     const user = await currentUser();
-
     if (!user) {
       return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
     }
@@ -23,15 +22,30 @@ export async function GET() {
     }
 
     const db = await getDb();
-    const interns = await db.collection("interns").find({}).toArray();
-    
-    return NextResponse.json(interns.map(i => ({
-      name: i.name,
-      email: i.email,
-      internId: i.internId,
-      tasks: i.tasks
-    })));
+    const logs = await db.collection("audit_logs")
+      .find({})
+      .sort({ timestamp: -1 })
+      .limit(50)
+      .toArray();
+
+    // Aggregates for savings
+    const summary = await db.collection("audit_logs").aggregate([
+      {
+        $group: {
+          _id: null,
+          totalSaved: { $sum: "$costSaved" },
+          totalCost: { $sum: "$actualCost" },
+          totalCalls: { $count: {} }
+        }
+      }
+    ]).toArray();
+
+    return NextResponse.json({
+      logs,
+      totals: summary[0] || { totalSaved: 0, totalCost: 0, totalCalls: 0 }
+    });
   } catch (err: any) {
+    console.error("[GET_AUDIT_LOGS_ERROR]", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
