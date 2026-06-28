@@ -4,11 +4,6 @@ import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getDb } from "@/lib/db";
 
-const ADMIN_WHITELIST = [
-  'ravirajjavvadhi@gmail.com',
-  'kevryntech@gmail.com'
-];
-
 export default async function WorkspaceLayout({
   children,
 }: {
@@ -21,25 +16,21 @@ export default async function WorkspaceLayout({
     redirect("/");
   }
 
-  // 1. Identity Verification Guard: Sovereign Lockdown
-  const isAdmin = ADMIN_WHITELIST.includes(email.toLowerCase());
-  
-  if (!isAdmin) {
-    try {
-      const db = await getDb();
-      // Only allow access if the intern exists in the official MongoDB registry
-      const intern = await db.collection("interns").findOne({ email: email.toLowerCase() });
-      
-      if (!intern) {
-        // If candidate is not in the recognized registry, block workspace entry
-        console.warn(`[SECURITY] Unauthorized Workspace Access Blocked for ${email}`);
-        redirect("/");
-      }
-    } catch (error) {
-      console.error("[SECURITY_GUARD_FAILURE]", error);
-      // Fail-secure: If DB check fails, redirect to protect the workspace
+  // 1. Identity Verification Guard: Sovereign Lockdown (Strict Mode)
+  try {
+    const db = await getDb();
+    // Only allow access if the intern exists in the official MongoDB registry
+    const intern = await db.collection("interns").findOne({ email: email.toLowerCase() });
+    
+    if (!intern) {
+      // No registry entry found. Absolute block.
+      console.warn(`[SECURITY] Unauthorized Workspace Access Blocked for ${email}`);
       redirect("/");
     }
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) throw error;
+    console.error("[SECURITY_GUARD_FAILURE]", error);
+    redirect("/");
   }
 
   return (
